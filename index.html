@@ -1,64 +1,731 @@
-<section id="exams">
-  <div class="container">
-    <div class="section-heading">
-      <h2>Choose Your Exam</h2>
-      <p>Find your target exam and prepare with a clear plan.</p>
-    </div>
-    <div class="cards">
-      <article class="card">
-        <div class="card-icon">📘</div>
-        <h3>SSC Exams</h3>
-        <p>Prepare for SSC CGL, CHSL, MTS and other SSC examinations.</p>
-        <a href="#coming">Explore SSC →</a>
-      </article>
-      <article class="card">
-        <div class="card-icon">🏦</div>
-        <h3>Banking Exams</h3>
-        <p>Build your practice routine for IBPS, SBI and related exams.</p>
-        <a href="#coming">Explore Banking →</a>
-      </article>
-      <article class="card">
-        <div class="card-icon">🚆</div>
-        <h3>Railway Exams</h3>
-        <p>Prepare for RRB NTPC, Group D and other railway examinations.</p>
-        <a href="#coming">Explore Railway →</a>
-      </article>
-    </div>
-  </div>
-</section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101b35">
+  <meta name="description" content="RankersBoard - Practice mock tests for SSC, Banking and Railway exams. Prepare smarter and track your progress.">
+  <title>RankersBoard | Practice. Improve. Succeed.</title>
 
-<section class="features" id="features">
-  <div class="container">
-    <div class="section-heading">
-      <h2>Everything Starts With Practice</h2>
-      <p>Tools designed around your exam preparation.</p>
-    </div>
-    <div class="feature-grid">
-      <div class="feature">
-        <div class="card-icon">⏱️</div>
-        <h3>Timed Mock Tests</h3>
-        <p>Practice under timed conditions to get comfortable with exam pressure.</p>
-      </div>
-      <div class="feature">
-        <div class="card-icon">📊</div>
-        <h3>Result Analysis</h3>
-        <p>Review scores and identify areas that need more practice.</p>
-      </div>
-      <div class="feature">
-        <div class="card-icon">📱</div>
-        <h3>Mobile Friendly</h3>
-        <p>Use the platform on your phone, tablet or computer.</p>
-      </div>
-    </div>
-  </div>
-</section>
+  <style>
+    :root {
+      --navy: #101b35;
+      --blue: #315efb;
+      --light-blue: #edf2ff;
+      --text: #172033;
+      --muted: #657087;
+      --white: #ffffff;
+      --border: #e7eaf1;
+      --green: #15966a;
+    }
 
-<section id="coming">
-  <div class="container">
-    <div class="cta">
-      <h2>Ready to begin your preparation?</h2>
-      <p>RankersBoard is being set up. Mock tests and student accounts will be added in the next development steps.</p>
-      <a class="btn" href="#exams">View Exam Categories</a>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: #ffffff;
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .container {
+      width: min(1120px, 90%);
+      margin: auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.97);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .navbar {
+      min-height: 76px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 23px;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.7px;
+    }
+
+    .logo-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      color: white;
+      background: var(--blue);
+      font-size: 20px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .nav-links a:hover {
+      color: var(--blue);
+    }
+
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      background: var(--blue);
+      color: white;
+      border: 1px solid var(--blue);
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      background: #2449d8;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--navy);
+      border-color: #dce2ef;
+    }
+
+    .btn-outline:hover {
+      color: var(--blue);
+      background: #f7f8ff;
+    }
+
+    .hero {
+      padding: 84px 0 76px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 85% 20%, #dce6ff 0, transparent 34%),
+        linear-gradient(135deg, #f7f9ff, #ffffff 65%);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 55px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border: 1px solid #dbe4ff;
+      background: #ffffff;
+      color: #3150bd;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      max-width: 660px;
+      margin: 22px 0 18px;
+      color: var(--navy);
+      font-size: clamp(38px, 5vw, 60px);
+      line-height: 1.1;
+      letter-spacing: -2px;
+    }
+
+    .hero h1 span {
+      color: var(--blue);
+    }
+
+    .hero-description {
+      max-width: 570px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .hero-note {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 25px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hero-note strong {
+      color: var(--green);
+    }
+
+    .preview-wrap {
+      position: relative;
+      padding: 12px;
+    }
+
+    .preview {
+      position: relative;
+      padding: 26px;
+      background: white;
+      border: 1px solid #e6eafa;
+      border-radius: 24px;
+      box-shadow: 0 25px 70px rgba(29, 52, 115, 0.13);
+    }
+
+    .preview-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .preview-top h3 {
+      color: var(--navy);
+      font-size: 17px;
+    }
+
+    .status {
+      padding: 5px 9px;
+      color: var(--green);
+      background: #e8f8f0;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 20px 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .progress {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #edf0f7;
+    }
+
+    .progress span {
+      display: block;
+      width: 72%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--blue);
+    }
+
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .mini-stat {
+      padding: 17px;
+      border-radius: 14px;
+      background: #f6f8ff;
+    }
+
+    .mini-stat strong {
+      display: block;
+      color: var(--navy);
+      font-size: 25px;
+    }
+
+    .mini-stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section {
+      padding: 76px 0;
+    }
+
+    .section-alt {
+      background: #f8faff;
+    }
+
+    .section-heading {
+      max-width: 650px;
+      margin: 0 auto 38px;
+      text-align: center;
+    }
+
+    .section-heading h2 {
+      color: var(--navy);
+      font-size: clamp(28px, 4vw, 38px);
+      line-height: 1.2;
+      letter-spacing: -1px;
+    }
+
+    .section-heading p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .card {
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #bdccff;
+      box-shadow: 0 14px 35px rgba(25, 48, 105, 0.07);
+    }
+
+    .card-icon {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      margin-bottom: 19px;
+      border-radius: 15px;
+      background: var(--light-blue);
+      font-size: 27px;
+    }
+
+    .card h3 {
+      margin-bottom: 8px;
+      color: var(--navy);
+      font-size: 20px;
+    }
+
+    .card p {
+      min-height: 72px;
+      margin-bottom: 19px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .text-link {
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .text-link:hover {
+      text-decoration: underline;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+    }
+
+    .feature {
+      padding: 22px 10px;
+      text-align: center;
+    }
+
+    .feature .card-icon {
+      margin: 0 auto 16px;
+    }
+
+    .feature h3 {
+      margin-bottom: 9px;
+      color: var(--navy);
+      font-size: 18px;
+    }
+
+    .feature p {
+      max-width: 310px;
+      margin: auto;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .cta {
+      padding: 48px 30px;
+      border-radius: 24px;
+      color: white;
+      text-align: center;
+      background: linear-gradient(120deg, #101b35, #2548ad);
+    }
+
+    .cta h2 {
+      font-size: clamp(27px, 4vw, 36px);
+      line-height: 1.25;
+    }
+
+    .cta p {
+      max-width: 610px;
+      margin: 13px auto 24px;
+      color: #dce4ff;
+      font-size: 15px;
+    }
+
+    .cta .btn {
+      color: var(--navy);
+      background: white;
+      border-color: white;
+    }
+
+    footer {
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      background: white;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .footer-inner p,
+    .footer-links {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a:hover {
+      color: var(--blue);
+    }
+
+    @media (max-width: 800px) {
+      .hero {
+        padding: 55px 0;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .hero h1 {
+        letter-spacing: -1.2px;
+      }
+
+      .preview-wrap {
+        max-width: 520px;
+        width: 100%;
+        margin: auto;
+      }
+
+      .cards,
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card p {
+        min-height: 0;
+      }
+
+      .section {
+        padding: 58px 0;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .container {
+        width: 91%;
+      }
+
+      .navbar {
+        min-height: 68px;
+      }
+
+      .logo {
+        font-size: 20px;
+      }
+
+      .logo-mark {
+        width: 36px;
+        height: 36px;
+      }
+
+      .nav-links {
+        gap: 12px;
+        font-size: 12px;
+      }
+
+      .nav-links .btn {
+        padding: 9px 11px;
+        font-size: 12px;
+      }
+
+      .nav-links .nav-about {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 40px;
+      }
+
+      .hero-description {
+        font-size: 15px;
+      }
+
+      .hero-actions .btn {
+        width: 100%;
+      }
+
+      .preview {
+        padding: 20px;
+      }
+
+      .mini-stat {
+        padding: 13px;
+      }
+
+      .mini-stat strong {
+        font-size: 22px;
+      }
+
+      .cta {
+        padding: 36px 20px;
+      }
+
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container navbar">
+      <a class="logo" href="#" aria-label="RankersBoard home">
+        <span class="logo-mark">R</span>
+        <span>RankersBoard</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#exams">Exams</a>
+        <a class="nav-about" href="#features">Features</a>
+        <a class="btn" href="#exams">Start Preparing</a>
+      </nav>
     </div>
-  </div>
-</section>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">🎯 Your exam preparation partner</div>
+          <h1>Prepare smarter.<br>Practice better.<br><span>Aim higher.</span></h1>
+          <p class="hero-description">
+            Your preparation journey starts here. Explore exam categories,
+            build your practice routine and get ready to achieve your goals
+            with RankersBoard.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn" href="#exams">Explore Mock Tests →</a>
+            <a class="btn btn-outline" href="#features">Discover Features</a>
+          </div>
+
+          <div class="hero-note">
+            <span>✓</span>
+            <span><strong>Built for aspirants</strong> preparing for competitive exams</span>
+          </div>
+        </div>
+
+        <div class="preview-wrap">
+          <div class="preview">
+            <div class="preview-top">
+              <h3>Your Preparation Dashboard</h3>
+              <span class="status">PREVIEW</span>
+            </div>
+
+            <p style="color:#657087;font-size:13px">
+              Every step forward starts with practice.
+            </p>
+
+            <div class="progress-label">
+              <span>Preparation journey</span>
+              <span>Keep going!</span>
+            </div>
+            <div class="progress"><span></span></div>
+
+            <div class="mini-stats">
+              <div class="mini-stat">
+                <strong>SSC</strong>
+                <span>Exam category</span>
+              </div>
+              <div class="mini-stat">
+                <strong>Banking</strong>
+                <span>Exam category</span>
+              </div>
+              <div class="mini-stat">
+                <strong>Railway</strong>
+                <span>Exam category</span>
+              </div>
+              <div class="mini-stat">
+                <strong>Daily</strong>
+                <span>Practice mindset</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="exams">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Choose Your Exam</h2>
+          <p>Find your target exam category and focus your preparation.</p>
+        </div>
+
+        <div class="cards">
+          <article class="card">
+            <div class="card-icon">📘</div>
+            <h3>SSC Exams</h3>
+            <p>Prepare for SSC CGL, CHSL, MTS and other SSC examinations.</p>
+            <a class="text-link" href="#coming">Explore SSC →</a>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">🏦</div>
+            <h3>Banking Exams</h3>
+            <p>Build your practice routine for IBPS, SBI and related exams.</p>
+            <a class="text-link" href="#coming">Explore Banking →</a>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">🚆</div>
+            <h3>Railway Exams</h3>
+            <p>Prepare for RRB NTPC, Group D and other railway examinations.</p>
+            <a class="text-link" href="#coming">Explore Railway →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="features">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Everything Starts With Practice</h2>
+          <p>Designed to support your competitive exam preparation.</p>
+        </div>
+
+        <div class="feature-grid">
+          <div class="feature">
+            <div class="card-icon">⏱️</div>
+            <h3>Timed Mock Tests</h3>
+            <p>Practice under timed conditions to get comfortable with exam pressure.</p>
+          </div>
+
+          <div class="feature">
+            <div class="card-icon">📊</div>
+            <h3>Result Analysis</h3>
+            <p>Review your scores and identify topics that need more practice.</p>
+          </div>
+
+          <div class="feature">
+            <div class="card-icon">📱</div>
+            <h3>Mobile Friendly</h3>
+            <p>Access the website layout on your phone, tablet or computer.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="coming">
+      <div class="container">
+        <div class="cta">
+          <h2>Your next step starts today.</h2>
+          <p>
+            RankersBoard is under development. Interactive mock tests,
+            student accounts, scores and paid test access will be added
+            in upcoming development stages.
+          </p>
+          <a class="btn" href="#exams">View Exam Categories</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <a class="logo" href="#">
+        <span class="logo-mark">R</span>
+        <span>RankersBoard</span>
+      </a>
+
+      <p>© <span id="year"></span> RankersBoard. All rights reserved.</p>
+
+      <div class="footer-links">
+        <a href="#exams">Exams</a>
+        <a href="#features">Features</a>
+        <a href="#coming">Coming Soon</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+  </script>
+</body>
+</html>
