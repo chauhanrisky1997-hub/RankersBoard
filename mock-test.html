@@ -1,0 +1,447 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101b35">
+<title>SSC CGL Mock Test | RankersBoard</title>
+<style>
+:root{--navy:#101b35;--blue:#315efb;--bg:#f3f5fa;--border:#e1e6ef;--muted:#647087;--green:#16865d;--red:#d93649}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#172033;font-family:Arial,Helvetica,sans-serif;line-height:1.5}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #91a9ff;outline-offset:2px}
+.topbar{background:var(--navy);color:white;padding:15px 4%;display:flex;justify-content:space-between;align-items:center;gap:15px}
+.brand{font-size:21px;font-weight:800}.brand span{color:#92aaff}
+.topbar small{color:#d7def0}
+.wrap{max-width:1200px;margin:24px auto;padding:0 16px}
+.intro,.panel,.question-card,.result-card{background:white;border:1px solid var(--border);border-radius:15px}
+.intro{padding:20px 24px;margin-bottom:18px}
+.intro h1{margin:0 0 5px;font-size:25px;color:var(--navy)}
+.intro p{margin:4px 0;color:var(--muted);font-size:14px}
+.test-grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px;align-items:start}
+.panel{padding:18px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:#f6f8fc;border-radius:10px;padding:12px;text-align:center}
+.stat strong{display:block;font-size:21px;color:var(--navy)}
+.stat span{font-size:12px;color:var(--muted)}
+.question-card{padding:24px}
+.q-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.pill{background:#edf2ff;color:#294dd2;padding:6px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.q-text{font-size:19px;font-weight:700;line-height:1.65;margin:10px 0 22px}
+.q-text .hi{display:block;margin-top:7px;font-size:17px;font-weight:500}
+.options{display:grid;gap:11px}
+.option{display:flex;align-items:flex-start;gap:12px;width:100%;padding:14px;border:1px solid var(--border);border-radius:11px;background:white;text-align:left;color:#172033}
+.option:hover{border-color:#91a8ff;background:#f8f9ff}
+.option.selected{border:2px solid var(--blue);background:#f0f4ff;padding:13px}
+.opt-letter{display:grid;place-items:center;flex-shrink:0;width:29px;height:29px;border-radius:8px;background:#edf0f6;font-weight:800}
+.option.selected .opt-letter{background:var(--blue);color:white}
+.opt-text{font-size:15px}
+.opt-text .hi{display:block;margin-top:3px;color:#566176}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}
+.btn{padding:11px 15px;border-radius:9px;border:1px solid var(--border);background:white;color:var(--navy);font-weight:700}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:white}
+.btn.review{background:#fff5df;border-color:#f0d28a;color:#79530b}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.sidebar h3{margin:0 0 14px;color:var(--navy);font-size:17px}
+.timer{font-size:29px;font-weight:800;letter-spacing:1px;color:var(--navy)}
+.timer.warning{color:var(--red)}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;color:var(--muted);margin:14px 0}
+.dot{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-2px;background:#edf0f6;border:1px solid #d6dce7}
+.dot.answered{background:#16865d;border-color:#16865d}
+.dot.review{background:#e9a322;border-color:#e9a322}
+.palette{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.pal{height:39px;border:1px solid var(--border);border-radius:8px;background:#f4f6fa;font-weight:700;color:#344057}
+.pal.answered{background:#16865d;color:white;border-color:#16865d}
+.pal.review{background:#e9a322;color:#241a00;border-color:#e9a322}
+.pal.current{outline:3px solid #9cb0ff;outline-offset:1px}
+.pal.answered.review{background:#16865d;color:white;border:3px solid #e9a322}
+.full{width:100%;margin-top:15px}
+.notice{font-size:12px;color:var(--muted);margin-top:12px}
+.result-card{padding:25px}
+.result-card h2{margin-top:0;color:var(--navy)}
+.score{font-size:43px;font-weight:800;color:var(--blue)}
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+.result-box{padding:13px;background:#f5f7fc;border-radius:10px}
+.result-box strong{display:block;font-size:21px}
+.review-item{padding:15px 0;border-top:1px solid var(--border)}
+.correct-text{color:var(--green);font-weight:700}
+.wrong-text{color:var(--red);font-weight:700}
+.hidden{display:none!important}
+footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
+@media(max-width:850px){.test-grid{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:1fr;gap:0}.intro h1{font-size:22px}.question-card{padding:18px}}
+@media(max-width:480px){.topbar{padding:13px 4%}.brand{font-size:18px}.topbar small{font-size:11px}.wrap{margin:14px auto;padding:0 10px}.intro{padding:16px}.stats{gap:6px}.stat{padding:9px 4px}.stat strong{font-size:18px}.question-card{padding:15px}.q-text{font-size:17px}.q-text .hi{font-size:15px}.actions .btn{flex:1}.result-stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">Rankers<span>Board</span></div>
+  <small>SSC CGL · Practice Test</small>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <h1>SSC CGL Mock Test — Demo 01</h1>
+    <p>Hindi + English | 10 Questions | 10 Minutes</p>
+    <p>Demo marking: +2 for correct answers, −0.5 for incorrect answers, 0 for unanswered.</p>
+  </section>
+
+  <section id="testArea">
+    <div class="test-grid">
+      <div>
+        <div class="panel stats">
+          <div class="stat"><strong id="answeredCount">0</strong><span>Answered</span></div>
+          <div class="stat"><strong id="remainingCount">10</strong><span>Not answered</span></div>
+          <div class="stat"><strong id="reviewCount">0</strong><span>Review marked</span></div>
+        </div>
+
+        <article class="question-card">
+          <div class="q-top">
+            <span class="pill" id="questionNumber">Question 1 of 10</span>
+            <span class="pill" id="subject">General Intelligence</span>
+          </div>
+          <div class="q-text" id="questionText"></div>
+          <div class="options" id="options"></div>
+          <div class="actions">
+            <button class="btn" id="prevBtn">← Previous</button>
+            <button class="btn review" id="reviewBtn">☆ Mark for Review</button>
+            <button class="btn" id="clearBtn">Clear Answer</button>
+            <button class="btn primary" id="nextBtn">Save & Next →</button>
+          </div>
+        </article>
+      </div>
+
+      <aside class="sidebar">
+        <section class="panel">
+          <h3>Time Remaining / शेष समय</h3>
+          <div class="timer" id="timer" role="timer" aria-live="off">10:00</div>
+          <p class="notice">The test will auto-submit when the timer reaches zero.</p>
+        </section>
+
+        <section class="panel">
+          <h3>Question Palette / प्रश्न सूची</h3>
+          <div class="legend">
+            <span><i class="dot answered"></i>Answered</span>
+            <span><i class="dot"></i>Not answered</span>
+            <span><i class="dot review"></i>Review</span>
+            <span><i class="dot" style="outline:2px solid #9cb0ff"></i>Current</span>
+          </div>
+          <div class="palette" id="palette"></div>
+          <button class="btn primary full" id="submitBtn">Submit Test / टेस्ट जमा करें</button>
+          <p class="notice">Please review your answers before submitting.</p>
+        </section>
+      </aside>
+    </div>
+  </section>
+
+  <section id="resultArea" class="result-card hidden" aria-live="polite"></section>
+</main>
+
+<footer>© <span id="year"></span> RankersBoard · SSC CGL Practice</footer>
+
+<script>
+"use strict";
+
+const questions = [
+  {
+    subject:"Reasoning / तर्कशक्ति",
+    en:"Find the next number: 2, 6, 12, 20, 30, ?",
+    hi:"अगली संख्या ज्ञात कीजिए: 2, 6, 12, 20, 30, ?",
+    options:[["36","36"],["40","40"],["42","42"],["44","44"]],
+    answer:2,
+    explanation:"The differences are 4, 6, 8, 10, then 12. So the next number is 42. / अंतर 4, 6, 8, 10 और फिर 12 हैं। इसलिए अगली संख्या 42 है।"
+  },
+  {
+    subject:"Reasoning / तर्कशक्ति",
+    en:"If CAT is coded as DBU, how is DOG coded using the same rule?",
+    hi:"यदि CAT को DBU लिखा जाता है, तो उसी नियम से DOG को कैसे लिखेंगे?",
+    options:[["EPH","EPH"],["EOG","EOG"],["DPH","DPH"],["FPH","FPH"]],
+    answer:0,
+    explanation:"Each letter moves one step forward: D→E, O→P, G→H. / हर अक्षर के बाद वाला अक्षर लिया गया है।"
+  },
+  {
+    subject:"Quantitative Aptitude / गणित",
+    en:"What is 25% of 240?",
+    hi:"240 का 25% कितना है?",
+    options:[["40","40"],["50","50"],["60","60"],["80","80"]],
+    answer:2,
+    explanation:"25% = 1/4, and 240 ÷ 4 = 60. / 25% = 1/4, इसलिए 240 ÷ 4 = 60।"
+  },
+  {
+    subject:"Quantitative Aptitude / गणित",
+    en:"A book costs ₹400. Its price increases by 10%. What is the new price?",
+    hi:"एक किताब की कीमत ₹400 है। कीमत में 10% की वृद्धि होती है। नई कीमत क्या होगी?",
+    options:[["₹410","₹410"],["₹420","₹420"],["₹440","₹440"],["₹450","₹450"]],
+    answer:2,
+    explanation:"10% of 400 = 40; new price = 400 + 40 = ₹440. / 400 का 10% = 40; नई कीमत ₹440 है।"
+  },
+  {
+    subject:"English / अंग्रेज़ी",
+    en:"Choose the synonym of “Rapid”.",
+    hi:"“Rapid” का समानार्थी शब्द चुनिए।",
+    options:[["Slow","धीमा"],["Quick","तेज़"],["Weak","कमज़ोर"],["Late","देर से"]],
+    answer:1,
+    explanation:"Rapid means quick or fast. / Rapid का अर्थ तेज़ होता है।"
+  },
+  {
+    subject:"English / अंग्रेज़ी",
+    en:"Choose the correct sentence.",
+    hi:"सही वाक्य चुनिए।",
+    options:[
+      ["She go to school daily.","वह रोज़ स्कूल जाती है।"],
+      ["She going to school daily.","वह रोज़ स्कूल जाती है।"],
+      ["She goes to school daily.","वह रोज़ स्कूल जाती है।"],
+      ["She gone to school daily.","वह रोज़ स्कूल जाती है।"]
+    ],
+    answer:2,
+    explanation:"With she/he/it in the simple present, the verb usually takes -s or -es. / Simple Present में She के साथ सामान्यतः verb में -s या -es लगता है।"
+  },
+  {
+    subject:"General Awareness / सामान्य ज्ञान",
+    en:"What is the capital of India?",
+    hi:"भारत की राजधानी क्या है?",
+    options:[["Mumbai / मुंबई","Mumbai / मुंबई"],["New Delhi / नई दिल्ली","New Delhi / नई दिल्ली"],["Kolkata / कोलकाता","Kolkata / कोलकाता"],["Chennai / चेन्नई","Chennai / चेन्नई"]],
+    answer:1,
+    explanation:"New Delhi is the capital of India. / नई दिल्ली भारत की राजधानी है।"
+  },
+  {
+    subject:"General Awareness / सामान्य ज्ञान",
+    en:"Which planet is known as the Red Planet?",
+    hi:"किस ग्रह को लाल ग्रह कहा जाता है?",
+    options:[["Venus / शुक्र","Venus / शुक्र"],["Jupiter / बृहस्पति","Jupiter / बृहस्पति"],["Mars / मंगल","Mars / मंगल"],["Mercury / बुध","Mercury / बुध"]],
+    answer:2,
+    explanation:"Mars is commonly known as the Red Planet. / मंगल को लाल ग्रह कहा जाता है।"
+  },
+  {
+    subject:"Quantitative Aptitude / गणित",
+    en:"The average of 10, 20 and 30 is:",
+    hi:"10, 20 और 30 का औसत है:",
+    options:[["15","15"],["20","20"],["25","25"],["30","30"]],
+    answer:1,
+    explanation:"Average = (10 + 20 + 30) ÷ 3 = 20. / औसत = (10 + 20 + 30) ÷ 3 = 20।"
+  },
+  {
+    subject:"Reasoning / तर्कशक्ति",
+    en:"Choose the odd one out.",
+    hi:"असंगत विकल्प चुनिए।",
+    options:[
+      ["Square / वर्ग","Square / वर्ग"],
+      ["Triangle / त्रिभुज","Triangle / त्रिभुज"],
+      ["Circle / वृत्त","Circle / वृत्त"],
+      ["Rose / गुलाब","Rose / गुलाब"]
+    ],
+    answer:3,
+    explanation:"Rose is a flower; the other options are geometric shapes. / गुलाब एक फूल है, जबकि बाकी ज्यामितीय आकृतियाँ हैं।"
+  }
+];
+
+const state = {
+  current:0,
+  answers:Array(questions.length).fill(null),
+  review:Array(questions.length).fill(false),
+  seconds:600,
+  finished:false
+};
+
+const $ = id => document.getElementById(id);
+const testArea = $("testArea");
+const resultArea = $("resultArea");
+let timerInterval = null;
+
+function renderQuestion(){
+  if(state.finished) return;
+  const q = questions[state.current];
+  $("questionNumber").textContent = `Question ${state.current+1} of ${questions.length}`;
+  $("subject").textContent = q.subject;
+  $("questionText").replaceChildren();
+
+  const english = document.createElement("span");
+  english.textContent = q.en;
+  english.className = "en";
+  $("questionText").appendChild(english);
+
+  const hindi = document.createElement("span");
+  hindi.textContent = q.hi;
+  hindi.className = "hi";
+  $("questionText").appendChild(hindi);
+
+  const options = $("options");
+  options.replaceChildren();
+
+  q.options.forEach((option,index)=>{
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "option" + (state.answers[state.current]===index ? " selected" : "");
+    button.setAttribute("aria-pressed",String(state.answers[state.current]===index));
+
+    const letter = document.createElement("span");
+    letter.className = "opt-letter";
+    letter.textContent = String.fromCharCode(65+index);
+
+    const textWrap = document.createElement("span");
+    textWrap.className = "opt-text";
+    const en = document.createElement("span");
+    en.textContent = option[0];
+    textWrap.appendChild(en);
+
+    button.append(letter,textWrap);
+    button.addEventListener("click",()=>{
+      state.answers[state.current]=index;
+      renderQuestion();
+    });
+    options.appendChild(button);
+  });
+
+  $("prevBtn").disabled = state.current===0;
+  $("nextBtn").textContent = state.current===questions.length-1 ? "Finish Questions →" : "Save & Next →";
+  $("reviewBtn").textContent = state.review[state.current] ? "★ Remove Review Mark" : "☆ Mark for Review";
+  renderPalette();
+  renderStats();
+}
+
+function renderPalette(){
+  const palette = $("palette");
+  palette.replaceChildren();
+  questions.forEach((q,index)=>{
+    const button = document.createElement("button");
+    button.type="button";
+    button.className="pal";
+    if(state.answers[index]!==null) button.classList.add("answered");
+    if(state.review[index]) button.classList.add("review");
+    if(index===state.current) button.classList.add("current");
+    button.textContent=String(index+1);
+    button.setAttribute("aria-label",`Go to question ${index+1}`);
+    button.addEventListener("click",()=>{
+      state.current=index;
+      renderQuestion();
+    });
+    palette.appendChild(button);
+  });
+}
+
+function renderStats(){
+  const answered = state.answers.filter(a=>a!==null).length;
+  $("answeredCount").textContent=answered;
+  $("remainingCount").textContent=questions.length-answered;
+  $("reviewCount").textContent=state.review.filter(Boolean).length;
+}
+
+function updateTimer(){
+  const mins=Math.floor(state.seconds/60);
+  const secs=state.seconds%60;
+  $("timer").textContent=`${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+  $("timer").classList.toggle("warning",state.seconds<=60);
+}
+
+function finishTest(auto=false){
+  if(state.finished) return;
+  const answered=state.answers.filter(a=>a!==null).length;
+  if(!auto && !confirm(`Submit your test?\nAnswered: ${answered} / ${questions.length}\nUnanswered: ${questions.length-answered}`)) return;
+
+  state.finished=true;
+  clearInterval(timerInterval);
+  let correct=0,wrong=0,unanswered=0;
+  state.answers.forEach((answer,index)=>{
+    if(answer===null) unanswered++;
+    else if(answer===questions[index].answer) correct++;
+    else wrong++;
+  });
+
+  const score=correct*2-wrong*0.5;
+  testArea.classList.add("hidden");
+  resultArea.classList.remove("hidden");
+  resultArea.replaceChildren();
+
+  const heading=document.createElement("h2");
+  heading.textContent=auto ? "Time Over — Test Submitted" : "Test Submitted Successfully!";
+  const scoreLabel=document.createElement("p");
+  scoreLabel.textContent="Your Demo Score / आपका स्कोर";
+  const scoreNumber=document.createElement("div");
+  scoreNumber.className="score";
+  scoreNumber.textContent=Number(score.toFixed(2))+" / "+(questions.length*2);
+
+  const summary=document.createElement("div");
+  summary.className="result-stats";
+  [
+    ["Correct / सही",correct],
+    ["Incorrect / गलत",wrong],
+    ["Unanswered / बिना उत्तर",unanswered]
+  ].forEach(([label,value])=>{
+    const box=document.createElement("div");
+    box.className="result-box";
+    const strong=document.createElement("strong");
+    strong.textContent=value;
+    const span=document.createElement("span");
+    span.textContent=label;
+    box.append(strong,span);
+    summary.appendChild(box);
+  });
+
+  const note=document.createElement("p");
+  note.className="notice";
+  note.textContent="This is a practice demo. Your result is shown in this browser only and is not saved to a student account.";
+  const reviewHeading=document.createElement("h2");
+  reviewHeading.textContent="Answer Review / उत्तरों की समीक्षा";
+
+  resultArea.append(heading,scoreLabel,scoreNumber,summary,note,reviewHeading);
+
+  questions.forEach((q,index)=>{
+    const item=document.createElement("div");
+    item.className="review-item";
+    const question=document.createElement("p");
+    question.textContent=`Q${index+1}. ${q.en} / ${q.hi}`;
+    const yourAnswer=document.createElement("p");
+    const selected=state.answers[index];
+    yourAnswer.textContent="Your answer / आपका उत्तर: "+(selected===null ? "Not answered / उत्तर नहीं दिया" : q.options[selected][0]);
+    yourAnswer.className=selected===null ? "" : selected===q.answer ? "correct-text" : "wrong-text";
+    const correctAnswer=document.createElement("p");
+    correctAnswer.className="correct-text";
+    correctAnswer.textContent="Correct answer / सही उत्तर: "+q.options[q.answer][0];
+    const explanation=document.createElement("p");
+    explanation.textContent="Explanation / व्याख्या: "+q.explanation;
+    item.append(question,yourAnswer,correctAnswer,explanation);
+    resultArea.appendChild(item);
+  });
+
+  const restart=document.createElement("button");
+  restart.className="btn primary";
+  restart.textContent="Restart Practice Test";
+  restart.addEventListener("click",()=>location.reload());
+  resultArea.appendChild(restart);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+$("prevBtn").addEventListener("click",()=>{
+  if(state.current>0){state.current--;renderQuestion();}
+});
+$("nextBtn").addEventListener("click",()=>{
+  if(state.current<questions.length-1){state.current++;renderQuestion();}
+  else finishTest(false);
+});
+$("reviewBtn").addEventListener("click",()=>{
+  state.review[state.current]=!state.review[state.current];
+  renderQuestion();
+});
+$("clearBtn").addEventListener("click",()=>{
+  state.answers[state.current]=null;
+  renderQuestion();
+});
+$("submitBtn").addEventListener("click",()=>finishTest(false));
+$("year").textContent=new Date().getFullYear();
+
+renderQuestion();
+updateTimer();
+timerInterval=setInterval(()=>{
+  if(state.finished){clearInterval(timerInterval);return;}
+  state.seconds--;
+  updateTimer();
+  if(state.seconds<=0){
+    state.seconds=0;
+    updateTimer();
+    finishTest(true);
+  }
+},1000);
+</script>
+</body>
+</html>
