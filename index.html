@@ -579,7 +579,35 @@
         <a href="#exams">Exams</a>
         <a class="nav-about" href="#features">Features</a>
         <a class="btn" href="#exams">Start Preparing</a>
-     <a href="candidate-login.html" class="login-btn">Candidate Login</a> </nav>
+     
+<div id="candidate-nav">
+  <a href="candidate-login.html" class="login-btn">Candidate Login</a>
+</div>
+
+<script type="module">
+  import { supabase } from "./supabase-client.js";
+
+  const nav = document.getElementById("candidate-nav");
+
+  async function updateCandidateNav() {
+    const { data } = await supabase.auth.getUser();
+    const user = data.user;
+
+    if (user) {
+      const name = user.user_metadata?.full_name || "Candidate";
+      nav.replaceChildren();
+
+      const dashboard = document.createElement("a");
+      dashboard.href = "candidate-dashboard.html";
+      dashboard.className = "login-btn";
+      dashboard.textContent = name + " · Dashboard";
+      nav.appendChild(dashboard);
+    }
+  }
+
+  updateCandidateNav();
+</script>
+ </nav>
     </div>
   </header>
 
