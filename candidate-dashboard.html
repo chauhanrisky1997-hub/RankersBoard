@@ -1,0 +1,297 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Candidate Dashboard | RankersBoard</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f6fc;
+      color: #17213a;
+    }
+
+    header {
+      background: #101b35;
+      color: white;
+      padding: 18px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo {
+      color: white;
+      text-decoration: none;
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #8eacff;
+    }
+
+    .home-link {
+      color: white;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 92%;
+      margin: 35px auto;
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .welcome h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .welcome p {
+      color: #64708a;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit, minmax(230px, 1fr)
+      );
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 14px;
+      border: 1px solid #e1e7f2;
+      box-shadow: 0 5px 18px rgba(16, 27, 53, 0.05);
+    }
+
+    .icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .card p {
+      color: #64708a;
+      line-height: 1.6;
+      font-size: 14px;
+      min-height: 45px;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #315efb;
+      color: white;
+      padding: 11px 15px;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background: #244bd1;
+    }
+
+    .logout-btn {
+      background: #dc3545;
+    }
+
+    .logout-btn:hover {
+      background: #b92534;
+    }
+
+    .message {
+      margin-top: 22px;
+      padding: 14px;
+      background: #e8efff;
+      color: #263f85;
+      border-radius: 9px;
+      line-height: 1.6;
+    }
+
+    .message.error {
+      background: #fff0f0;
+      color: #a52222;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #748098;
+      font-size: 13px;
+    }
+
+    @media (max-width: 500px) {
+      .welcome h1 {
+        font-size: 25px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="index.html" class="logo">
+      Rankers<span>Board</span>
+    </a>
+
+    <a href="index.html" class="home-link">
+      ← Back to Home
+    </a>
+  </header>
+
+  <main class="container">
+    <div class="welcome">
+      <h1>Candidate Dashboard</h1>
+      <p id="welcomeText">
+        Welcome! Your account is loading...
+      </p>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <div class="icon">👤</div>
+        <h2>Account Details</h2>
+        <p>
+          Apna full name, registered email, account
+          creation date aur Candidate ID dekhein.
+        </p>
+        <a href="account-details.html" class="btn">
+          View Account
+        </a>
+      </section>
+
+      <section class="card">
+        <div class="icon">📚</div>
+        <h2>Saved Questions</h2>
+        <p>
+          Apne save kiye hue questions ko dobara
+          dekhne aur practice karne ke liye.
+        </p>
+        <a href="saved-questions.html" class="btn">
+          View Saved Questions
+        </a>
+      </section>
+
+      <section class="card">
+        <div class="icon">🛍️</div>
+        <h2>My Purchases</h2>
+        <p>
+          Apne purchased mock tests aur courses
+          ki details dekhne ke liye.
+        </p>
+        <a href="my-purchases.html" class="btn">
+          View Purchases
+        </a>
+      </section>
+
+      <section class="card">
+        <div class="icon">🚪</div>
+        <h2>Logout</h2>
+        <p>
+          Apne RankersBoard account se securely
+          sign out karein.
+        </p>
+        <button id="logoutBtn" class="btn logout-btn">
+          Logout
+        </button>
+      </section>
+    </div>
+
+    <div id="message" class="message" role="status">
+      Account verify ho raha hai...
+    </div>
+  </main>
+
+  <footer>
+    © 2026 RankersBoard. Practice. Improve. Succeed.
+  </footer>
+
+  <script type="module">
+    import { supabase } from "./supabase-client.js";
+
+    const welcomeText = document.getElementById("welcomeText");
+    const message = document.getElementById("message");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    async function loadDashboard() {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error || !data.user) {
+          window.location.replace("candidate-login.html");
+          return;
+        }
+
+        const user = data.user;
+        const fullName =
+          user.user_metadata?.full_name || "Candidate";
+
+        welcomeText.textContent = "Welcome, " + fullName + "!";
+        message.textContent =
+          "Aap successfully login hain. Dashboard use kar sakte hain.";
+
+      } catch (error) {
+        message.textContent =
+          "Account verify nahi ho paya. Internet connection check karke page reload karein.";
+        message.classList.add("error");
+      }
+    }
+
+    logoutBtn.addEventListener("click", async () => {
+      logoutBtn.disabled = true;
+      logoutBtn.textContent = "Logging out...";
+
+      try {
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+          throw error;
+        }
+
+        window.location.replace("candidate-login.html");
+
+      } catch (error) {
+        message.textContent =
+          "Logout nahi ho paya. Dobara try karein.";
+        message.classList.add("error");
+
+        logoutBtn.disabled = false;
+        logoutBtn.textContent = "Logout";
+      }
+    });
+
+    loadDashboard();
+  </script>
+</body>
+</html>
+```
