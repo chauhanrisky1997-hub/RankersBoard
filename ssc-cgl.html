@@ -1,1 +1,213 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>SSC CGL Mock Tests | RankersBoard</title>
+  <meta name="description" content="Practice SSC CGL mock tests and previous year papers on RankersBoard.">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fc;
+      color: #172033;
+    }
+
+    header {
+      background: #101b35;
+      padding: 18px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .logo {
+      color: white;
+      font-size: 24px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 18px;
+      font-size: 14px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 55px 20px 35px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #e5ebff;
+      color: #315efb;
+      padding: 8px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    h1 {
+      color: #101b35;
+      font-size: clamp(30px, 5vw, 42px);
+      margin: 18px 0 12px;
+    }
+
+    .hero p {
+      color: #657087;
+      margin: 0;
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px 20px 65px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e7eaf1;
+      border-radius: 18px;
+      min-height: 220px;
+      padding: 28px 24px;
+      text-decoration: none;
+      color: #172033;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px #101b3512;
+    }
+
+    .emoji {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: #edf2ff;
+      display: grid;
+      place-items: center;
+      font-size: 29px;
+      margin-bottom: 22px;
+    }
+
+    .card h2 {
+      font-size: 21px;
+      margin: 0 0 12px;
+    }
+
+    .card p {
+      color: #657087;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
+
+    .link-text {
+      color: #315efb;
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: auto;
+    }
+
+    footer {
+      background: #101b35;
+      color: #cbd3e5;
+      text-align: center;
+      padding: 23px 15px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 750px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        padding: 16px 5%;
+      }
+
+      nav a {
+        margin-left: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a class="logo" href="index.html">RankersBoard</a>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="free-tests.html">Free Tests</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <span class="tag">SSC CGL</span>
+    <h1>SSC CGL Mock Tests</h1>
+    <p>Select an exam year to explore available mock tests.</p>
+  </section>
+
+  <main class="container">
+    <div class="grid">
+
+      <a class="card" href="ssc-cgl-2026.html">
+        <div class="emoji">📘</div>
+        <h2>2026 CGL</h2>
+        <p>SSC CGL 2026 practice tests.</p>
+        <span class="link-text">Explore Tests →</span>
+      </a>
+
+      <a class="card" href="ssc-cgl-2025.html">
+        <div class="emoji">📗</div>
+        <h2>2025 CGL</h2>
+        <p>SSC CGL 2025 practice tests and papers.</p>
+        <span class="link-text">Explore Tests →</span>
+      </a>
+
+      <a class="card" href="ssc-cgl-2024.html">
+        <div class="emoji">📙</div>
+        <h2>2024 CGL</h2>
+        <p>SSC CGL 2024 practice tests and papers.</p>
+        <span class="link-text">Explore Tests →</span>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>
+    © 2026 RankersBoard. Practice. Improve. Succeed.
+  </footer>
+</body>
+</html>
+
