@@ -580,9 +580,118 @@
         <a class="nav-about" href="#features">Features</a>
         <a class="btn" href="#exams">Start Preparing</a>
      
+```html
 <div id="candidate-nav">
-  <a href="candidate-login.html" class="login-btn">Candidate Login</a>
+  <a href="candidate-login.html" class="login-btn">
+    Candidate Login
+  </a>
 </div>
+
+<style>
+  #candidate-nav {
+    position: relative;
+    display: inline-block;
+    z-index: 1000;
+  }
+
+  #candidate-nav .login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 16px;
+    background: #315efb;
+    color: #ffffff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  #candidate-nav .login-btn:hover {
+    background: #244bd1;
+  }
+
+  #candidate-nav .dashboard-toggle {
+    border: none;
+    font-family: inherit;
+  }
+
+  #candidate-nav .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 225px;
+    padding: 7px;
+    background: #ffffff;
+    border: 1px solid #e5eaf3;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(16, 27, 53, 0.16);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px);
+
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s ease,
+      visibility 0.22s ease;
+  }
+
+  #candidate-nav .dropdown-menu.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  #candidate-nav .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    padding: 12px;
+    color: #17213a;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: left;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  #candidate-nav .dropdown-item:hover {
+    background: #edf2ff;
+    color: #315efb;
+  }
+
+  #candidate-nav .dropdown-item.logout {
+    color: #dc3545;
+  }
+
+  #candidate-nav .dropdown-item.logout:hover {
+    background: #fff0f0;
+  }
+
+  #candidate-nav .menu-divider {
+    height: 1px;
+    margin: 5px 4px;
+    background: #e8edf5;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    #candidate-nav:hover .dropdown-menu,
+    #candidate-nav:focus-within .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+  }
+</style>
 
 <script type="module">
   import { supabase } from "./supabase-client.js";
@@ -590,20 +699,118 @@
   const nav = document.getElementById("candidate-nav");
 
   async function updateCandidateNav() {
-    const { data } = await supabase.auth.getUser();
-    const user = data.user;
+    const { data, error } = await supabase.auth.getUser();
 
-    if (user) {
-      const name = user.user_metadata?.full_name || "Candidate";
+    if (error || !data.user) {
       nav.replaceChildren();
 
-      const dashboard = document.createElement("a");
-      dashboard.href = "candidate-dashboard.html";
-      dashboard.className = "login-btn";
-      dashboard.textContent = name + " · Dashboard";
-      nav.appendChild(dashboard);
+      const login = document.createElement("a");
+      login.href = "candidate-login.html";
+      login.className = "login-btn";
+      login.textContent = "Candidate Login";
+
+      nav.appendChild(login);
+      return;
     }
+
+    const user = data.user;
+    const name = user.user_metadata?.full_name || "Candidate";
+
+    nav.replaceChildren();
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "login-btn dashboard-toggle";
+    toggle.innerHTML = "";
+
+    const nameText = document.createElement("span");
+    nameText.textContent = name + " · Dashboard";
+
+    const arrow = document.createElement("span");
+    arrow.textContent = "▾";
+    arrow.setAttribute("aria-hidden", "true");
+
+    toggle.append(nameText, arrow);
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-haspopup", "true");
+
+    const menu = document.createElement("div");
+    menu.className = "dropdown-menu";
+    menu.id = "candidate-dropdown";
+
+    const items = [
+      { label: "Account Details", icon: "👤", href: "account-details.html" },
+      { label: "Saved Questions", icon: "🔖", href: "saved-questions.html" },
+      { label: "My Purchases", icon: "🛍️", href: "my-purchases.html" }
+    ];
+
+    items.forEach(item => {
+      const link = document.createElement("a");
+      link.className = "dropdown-item";
+      link.href = item.href;
+
+      const icon = document.createElement("span");
+      icon.textContent = item.icon;
+
+      const label = document.createElement("span");
+      label.textContent = item.label;
+
+      link.append(icon, label);
+      menu.appendChild(link);
+    });
+
+    const divider = document.createElement("div");
+    divider.className = "menu-divider";
+    menu.appendChild(divider);
+
+    const logout = document.createElement("button");
+    logout.type = "button";
+    logout.className = "dropdown-item logout";
+    logout.innerHTML = "🚪 Logout";
+    menu.appendChild(logout);
+
+    toggle.setAttribute("aria-controls", menu.id);
+
+    toggle.addEventListener("click", () => {
+      const isOpen = menu.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    document.addEventListener("click", event => {
+      if (!nav.contains(event.target)) {
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    logout.addEventListener("click", async () => {
+      logout.disabled = true;
+      logout.textContent = "Logging out...";
+
+      const { error: logoutError } = await supabase.auth.signOut();
+
+      if (logoutError) {
+        logout.disabled = false;
+        logout.textContent = "🚪 Logout";
+        alert("Logout failed. Please try again.");
+        return;
+      }
+
+      window.location.href = "candidate-login.html";
+    });
+
+    nav.append(toggle, menu);
   }
+
+  updateCandidateNav();
+</script>
 
   updateCandidateNav();
 </script>
