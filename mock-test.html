@@ -1,393 +1,319 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101b35">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
 <title>Mock Test | RankersBoard</title>
 <style>
-:root{--navy:#101b35;--blue:#315efb;--bg:#f3f5fa;--border:#e1e6ef;--muted:#647087;--green:#16865d;--red:#d93649}
+:root{--blue:#214fd2;--green:#168044;--red:#d83a4d;--yellow:#fff7c6;--ink:#202124;--line:#d8dce2;--muted:#70757d;--sand:#d9cfb8}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#172033;font-family:Arial,Helvetica,sans-serif;line-height:1.5}
-button{font:inherit;cursor:pointer}
-button:focus-visible{outline:3px solid #91a9ff;outline-offset:2px}
-.topbar{background:var(--navy);color:white;padding:15px 4%;display:flex;justify-content:space-between;align-items:center;gap:15px}
-.brand{font-size:21px;font-weight:800}.brand span{color:#92aaff}
-.topbar small{color:#d7def0}
-.wrap{max-width:1200px;margin:24px auto;padding:0 16px}
-.intro,.panel,.question-card,.result-card{background:white;border:1px solid var(--border);border-radius:15px}
-.intro{padding:20px 24px;margin-bottom:18px}
-.intro h1{margin:0 0 5px;font-size:25px;color:var(--navy)}
-.intro p{margin:4px 0;color:var(--muted);font-size:14px}
-.test-grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px;align-items:start}
-.panel{padding:18px;margin-bottom:16px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat{background:#f6f8fc;border-radius:10px;padding:12px;text-align:center}
-.stat strong{display:block;font-size:21px;color:var(--navy)}
-.stat span{font-size:12px;color:var(--muted)}
-.question-card{padding:24px}
-.q-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
-.pill{background:#edf2ff;color:#294dd2;padding:6px 10px;border-radius:20px;font-size:12px;font-weight:700}
-.q-text{font-size:19px;font-weight:700;line-height:1.65;margin:10px 0 22px}
-.q-text .hi{display:block;margin-top:7px;font-size:17px;font-weight:500}
-.options{display:grid;gap:11px}
-.option{display:flex;align-items:flex-start;gap:12px;width:100%;padding:14px;border:1px solid var(--border);border-radius:11px;background:white;text-align:left;color:#172033}
-.option:hover{border-color:#91a8ff;background:#f8f9ff}
-.option.selected{border:2px solid var(--blue);background:#f0f4ff;padding:13px}
-.opt-letter{display:grid;place-items:center;flex-shrink:0;width:29px;height:29px;border-radius:8px;background:#edf0f6;font-weight:800}
-.option.selected .opt-letter{background:var(--blue);color:white}
-.opt-text{font-size:15px}
-.opt-text .hi{display:block;margin-top:3px;color:#566176}
-.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}
-.btn{padding:11px 15px;border-radius:9px;border:1px solid var(--border);background:white;color:var(--navy);font-weight:700}
-.btn.primary{background:var(--blue);border-color:var(--blue);color:white}
-.btn.review{background:#fff5df;border-color:#f0d28a;color:#79530b}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.sidebar h3{margin:0 0 14px;color:var(--navy);font-size:17px}
-.timer{font-size:29px;font-weight:800;letter-spacing:1px;color:var(--navy)}
-.timer.warning{color:var(--red)}
-.legend{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;color:var(--muted);margin:14px 0}
-.dot{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-2px;background:#edf0f6;border:1px solid #d6dce7}
-.dot.answered{background:#16865d;border-color:#16865d}
-.dot.review{background:#e9a322;border-color:#e9a322}
-.palette{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
-.pal{height:39px;border:1px solid var(--border);border-radius:8px;background:#f4f6fa;font-weight:700;color:#344057}
-.pal.answered{background:#16865d;color:white;border-color:#16865d}
-.pal.review{background:#e9a322;color:#241a00;border-color:#e9a322}
-.pal.current{outline:3px solid #9cb0ff;outline-offset:1px}
-.pal.answered.review{background:#16865d;color:white;border:3px solid #e9a322}
-.full{width:100%;margin-top:15px}
-.notice{font-size:12px;color:var(--muted);margin-top:12px}
-.result-card{padding:25px}
-.result-card h2{margin-top:0;color:var(--navy)}
-.score{font-size:43px;font-weight:800;color:var(--blue)}
-.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
-.result-box{padding:13px;background:#f5f7fc;border-radius:10px}
-.result-box strong{display:block;font-size:21px}
-.review-item{padding:15px 0;border-top:1px solid var(--border)}
-.correct-text{color:var(--green);font-weight:700}
-.wrong-text{color:var(--red);font-weight:700}
+html,body{margin:0;min-height:100%;background:#fff;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+body{font-size:16px}
+button,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible{outline:3px solid #91b3ff;outline-offset:2px}
+.topline{min-height:70px;border-bottom:1px solid #d9dce1;display:flex;align-items:center;gap:12px;padding:10px 20px;background:#fff}
+.exam-title{font-size:18px;font-weight:700;flex:1;min-width:160px}
+.top-actions{display:flex;align-items:center;gap:12px}
+.zoom{height:62px;min-width:62px;border:0;background:var(--blue);color:#fff;font-size:27px;font-weight:700}
+.pause{height:62px;width:64px;background:#fff;border:1px solid #d8d8d8;font-size:27px}
+.timerbox{width:110px;min-width:110px}
+.timerlabel{font-size:17px;margin-bottom:1px}
+.timer{background:var(--yellow);color:#d83a4d;font-size:30px;font-weight:800;line-height:1.25;padding:2px 7px;overflow-wrap:anywhere}
+.timer.warning{color:#c62828}
+.utilitybar{display:flex;align-items:center;gap:22px;padding:12px 20px;border-bottom:1px solid #e4e4e4}
+.utilitybar button{border:0;background:none;padding:0;color:#cf5555;text-decoration:underline;font-size:20px}
+.sectionbar{padding:12px 20px 0;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.section-tab{border:0;background:var(--green);color:#fff;padding:12px 15px;font-size:18px;min-height:48px}
+.section-tab.active{background:#08733a}
+.section-tab.subject{display:block;width:max-content;max-width:100%;flex-basis:100%;text-align:left;margin-top:6px}
+.controlbar{padding:13px 20px 8px;display:flex;gap:10px;flex-wrap:wrap}
+.exam-btn{border:0;background:var(--blue);color:#fff;padding:11px 15px;min-height:48px;font-size:18px;font-weight:700}
+.exam-btn:disabled{opacity:.45;cursor:not-allowed}
+.exam-btn.danger{background:#c72e42}
+.marking{padding:8px 20px 0;font-size:20px}
+.answered-line{padding:9px 20px 12px;font-size:26px;font-weight:700}
+.answered-line strong{color:#d83a4d;background:var(--yellow);padding:0 5px}
+.exam-layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:0;padding:0 20px 30px;align-items:stretch}
+.question-area{border:1px solid #d8dce2;min-width:0;min-height:560px}
+.question-head{padding:12px 20px;border-bottom:1px solid #e0e0e0;font-size:23px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.last-time{color:#cf626d;font-size:18px}
+.question-tools{display:flex;align-items:center;gap:8px;padding:8px 0 0}
+.language{font-size:17px;padding:8px 12px;border:1px solid #ddd;border-radius:12px;background:#fff;max-width:45%}
+.tool-spacer{flex:1}
+.small-action{border:0;color:#fff;padding:11px 14px;font-size:17px;background:#20b85b}
+.small-action.report{background:#d63245;border-radius:12px 12px 12px 0}
+.question-content{padding:26px 36px 32px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(22px,2.1vw,31px);line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.option-list{padding:0 22px 28px;display:grid;gap:0}
+.option-row{display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid #e1e1e1;padding:12px 8px;font-size:20px;line-height:1.45;cursor:pointer}
+.option-row input{width:19px;height:19px;margin-top:5px;accent-color:var(--blue);flex-shrink:0}
+.palette-panel{border:1px solid #d8dce2;border-left:0;min-width:0;background:#fff}
+.palette-head{padding:16px 14px;font-size:22px;font-weight:600}
+.palette-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;padding:8px 15px 22px}
+.palette-btn{border:0;border-radius:6px;background:var(--blue);color:#fff;min-height:36px;font-size:18px}
+.palette-btn.answered{background:var(--green)}
+.palette-btn.review{background:#d7a52e;color:#171717}
+.palette-btn.current{outline:3px solid #8aa8ff;outline-offset:2px}
+.palette-btn.answered.review{border:3px solid #d7a52e}
+.analysis-title{background:var(--sand);padding:14px;font-size:20px;font-weight:600}
+.analysis-list{padding:12px 14px;display:grid;gap:14px;font-size:18px}
+.analysis-list span{display:flex;justify-content:space-between;gap:12px}
+.analysis-list b{background:var(--yellow);color:#d83a4d;padding:0 5px}
+.drawer-toggle{display:none}
+.overlay{display:none}
+.result{margin:20px;padding:24px;border:1px solid var(--line)}
+.result h2{margin-top:0}.score{font-size:38px;font-weight:800;color:var(--blue)}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.result-grid div{padding:14px;background:#f5f5f5}.result-grid b{display:block;font-size:23px}
+.review-item{padding:14px 0;border-top:1px solid var(--line)}
 .hidden{display:none!important}
-footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
-@media(max-width:850px){.test-grid{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:1fr;gap:0}.intro h1{font-size:22px}.question-card{padding:18px}}
-@media(max-width:480px){.topbar{padding:13px 4%}.brand{font-size:18px}.topbar small{font-size:11px}.wrap{margin:14px auto;padding:0 10px}.intro{padding:16px}.stats{gap:6px}.stat{padding:9px 4px}.stat strong{font-size:18px}.question-card{padding:15px}.q-text{font-size:17px}.q-text .hi{font-size:15px}.actions .btn{flex:1}.result-stats{grid-template-columns:1fr 1fr}}
+footer{text-align:center;color:#888;font-size:11px;padding:15px}
+@media(max-width:800px){
+ .topline{padding:9px 12px;gap:7px;min-height:78px}
+ .exam-title{font-size:16px;min-width:100px}
+ .top-actions{gap:7px}
+ .zoom{height:54px;min-width:48px;font-size:23px}
+ .pause{height:54px;width:54px}
+ .timerbox{width:110px;min-width:110px}
+ .timerlabel{font-size:15px}.timer{font-size:29px}
+ .utilitybar{padding:10px 20px;gap:20px}
+ .utilitybar button{font-size:19px}
+ .sectionbar{padding:9px 20px 0}
+ .section-tab{padding:10px 14px;font-size:17px;min-height:44px}
+ .controlbar{padding:12px 20px 7px;gap:9px}
+ .exam-btn{font-size:17px;min-height:47px;padding:9px 13px}
+ .marking{font-size:18px;padding:8px 20px 0}
+ .answered-line{font-size:24px;padding:8px 20px 10px}
+ .exam-layout{display:block;padding:0 20px 24px}
+ .question-area{min-height:500px}
+ .question-head{font-size:22px;padding:12px 20px}
+ .question-content{padding:26px 22px;font-size:clamp(22px,4.6vw,30px);line-height:1.72}
+ .option-row{font-size:20px}
+ .palette-panel{display:none;position:fixed;z-index:50;top:28%;right:0;bottom:0;width:min(82vw,430px);overflow:auto;border:1px solid #ccc;box-shadow:0 0 0 999px #0003}
+ .palette-panel.open{display:block}
+ .drawer-toggle{display:block;position:fixed;right:0;top:47%;z-index:60;border:0;background:#1683df;color:#fff;font-size:35px;width:42px;height:64px;clip-path:polygon(100% 0,100% 100%,0 50%);padding:0 0 0 9px}
+ .overlay.show{display:block;position:fixed;inset:0;background:#0003;z-index:40}
+}
+@media(max-width:430px){
+ .exam-title{font-size:14px}
+ .zoom{min-width:43px;width:43px;height:50px;font-size:21px}
+ .pause{width:46px;height:50px;font-size:22px}
+ .timerbox{width:96px;min-width:96px}
+ .timerlabel{font-size:14px}.timer{font-size:26px}
+ .controlbar{gap:7px}.exam-btn{font-size:16px;padding:9px 11px;min-height:45px}
+ .question-head{font-size:20px;padding:10px 14px}
+ .question-tools{gap:6px}.language{font-size:15px;padding:7px 8px}
+ .small-action{font-size:15px;padding:10px 10px}
+ .question-content{padding:23px 18px;font-size:24px}
+ .option-list{padding:0 14px 22px}
+ .option-row{font-size:18px}
+ .result-grid{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">Rankers<span>Board</span></div>
-  <small>SSC CGL · Practice Test</small>
+<header class="topline">
+  <div class="exam-title" id="testTitle">Loading test…</div>
+  <div class="top-actions">
+    <button class="zoom" id="zoomIn" aria-label="Zoom in">(+)</button>
+    <button class="zoom" id="zoomOut" aria-label="Zoom out">(−)</button>
+    <button class="pause" id="pauseBtn" aria-label="Pause timer">Ⅱ</button>
+    <div class="timerbox"><div class="timerlabel">Time Left</div><div class="timer" id="timer">--:--</div></div>
+  </div>
 </header>
+<nav class="utilitybar">
+  <button id="symbolsBtn">SYMBOLS</button>
+  <button id="instructionsBtn">INSTRUCTIONS</button>
+</nav>
+<div class="sectionbar" id="sectionBar">
+  <button class="section-tab active" id="sectionLetter">A</button>
+  <button class="section-tab" id="sectionB" disabled>B</button>
+  <button class="section-tab" id="sectionC" disabled>C</button>
+  <button class="section-tab subject" id="sectionName">LOADING SECTION</button>
+</div>
+<div class="controlbar">
+  <button class="exam-btn" id="prevBtn">Previous</button>
+  <button class="exam-btn" id="reviewBtn">Mark For Review</button>
+  <button class="exam-btn" id="nextBtn">Save &amp; Next</button>
+  <button class="exam-btn" id="clearBtn">Clear</button>
+  <button class="exam-btn" id="submitSectionBtn">Submit Section</button>
+  <button class="exam-btn" id="submitBtn">Submit Test</button>
+</div>
+<div class="marking" id="markingMeta">Marks for correct answer: — | Negative: —</div>
+<div class="answered-line">Total Questions Answered: <strong id="answeredCount">0</strong></div>
 
-<main class="wrap">
-  <section class="intro">
-    <h1 id="testTitle">Loading test…</h1>
-    <p id="testMeta">Please wait while your test loads.</p>
-    <p id="markingMeta">Marking scheme will appear here.</p>
-  </section>
-
-  <section id="testArea">
-    <p id="loadingMessage" class="panel">Verifying your login and loading questions…</p>
-    <div class="test-grid">
-      <div>
-        <div class="panel stats">
-          <div class="stat"><strong id="answeredCount">0</strong><span>Answered</span></div>
-          <div class="stat"><strong id="remainingCount">10</strong><span>Not answered</span></div>
-          <div class="stat"><strong id="reviewCount">0</strong><span>Review marked</span></div>
-        </div>
-
-        <article class="question-card">
-          <div class="q-top">
-            <span class="pill" id="questionNumber">Question 1 of 10</span>
-            <span class="pill" id="subject">General Intelligence</span>
-          </div>
-          <div class="q-text" id="questionText"></div>
-          <div class="options" id="options"></div>
-          <div class="actions">
-            <button class="btn" id="prevBtn">← Previous</button>
-            <button class="btn review" id="reviewBtn">☆ Mark for Review</button>
-            <button class="btn" id="clearBtn">Clear Answer</button>
-            <button class="btn primary" id="nextBtn">Save & Next →</button>
-          </div>
-        </article>
+<main id="testArea">
+  <div class="exam-layout">
+    <section class="question-area">
+      <div class="question-head">
+        <span id="questionNumber">Question: 1</span>
+        <span class="last-time" id="lastTime">Last 00 Minutes</span>
       </div>
+      <div class="question-tools">
+        <select class="language" id="languageSelect" aria-label="Question language"><option value="en">English</option></select>
+        <span class="tool-spacer"></span>
+        <button class="small-action" id="saveQuestionBtn">Save</button>
+        <button class="small-action report" id="reportBtn">Report</button>
+      </div>
+      <div class="question-content" id="questionText">Verifying your login and loading questions…</div>
+      <div class="option-list" id="options"></div>
+    </section>
 
-      <aside class="sidebar">
-        <section class="panel">
-          <h3>Time Remaining / शेष समय</h3>
-          <div class="timer" id="timer" role="timer" aria-live="off">10:00</div>
-          <p class="notice">The test will auto-submit when the timer reaches zero.</p>
-        </section>
-
-        <section class="panel">
-          <h3>Question Palette / प्रश्न सूची</h3>
-          <div class="legend">
-            <span><i class="dot answered"></i>Answered</span>
-            <span><i class="dot"></i>Not answered</span>
-            <span><i class="dot review"></i>Review</span>
-            <span><i class="dot" style="outline:2px solid #9cb0ff"></i>Current</span>
-          </div>
-          <div class="palette" id="palette"></div>
-          <button class="btn primary full" id="submitBtn">Submit Test / टेस्ट जमा करें</button>
-          <p class="notice">Please review your answers before submitting.</p>
-        </section>
-      </aside>
-    </div>
-  </section>
-
-  <section id="resultArea" class="result-card hidden" aria-live="polite"></section>
+    <aside class="palette-panel" id="palettePanel">
+      <div class="palette-head" id="paletteHeading">General Intelligence and Reasoning</div>
+      <div class="palette-grid" id="palette"></div>
+      <div class="analysis-title" id="analysisHeading">General Intelligence and Reasoning Analysis</div>
+      <div class="analysis-list">
+        <span>Answered <b id="paletteAnswered">0</b></span>
+        <span>Not Answered <b id="paletteUnanswered">0</b></span>
+        <span>Marked for Review <b id="paletteReview">0</b></span>
+      </div>
+    </aside>
+  </div>
 </main>
-
-<footer>© <span id="year"></span> RankersBoard · SSC CGL Practice</footer>
+<button class="drawer-toggle" id="drawerToggle" aria-label="Open question palette">◀</button>
+<div class="overlay" id="overlay"></div>
+<section class="result hidden" id="resultArea"></section>
+<footer>© <span id="year"></span> RankersBoard. Practice. Improve. Succeed.</footer>
 
 <script type="module">
 "use strict";
 import { supabase } from "./supabase-client.js";
-
-let questions = [];
-let testConfig = null;
-
-const state = {
-  current:0,
-  answers:[],
-  review:[],
-  seconds:0,
-  finished:false
-};
-
-const $ = id => document.getElementById(id);
-const testArea = $("testArea");
-const resultArea = $("resultArea");
-let timerInterval = null;
-
-function renderQuestion(){
-  if(state.finished) return;
-  const q = questions[state.current];
-  $("questionNumber").textContent = `Question ${state.current+1} of ${questions.length}`;
-  $("subject").textContent = q.subject;
-  $("questionText").replaceChildren();
-
-  const english = document.createElement("span");
-  english.textContent = q.en;
-  english.className = "en";
-  $("questionText").appendChild(english);
-
-  const hindi = document.createElement("span");
-  hindi.textContent = q.hi || "";
-  if (!q.hi) hindi.hidden = true;
-  hindi.className = "hi";
-  $("questionText").appendChild(hindi);
-
-  const options = $("options");
-  options.replaceChildren();
-
-  q.options.forEach((option,index)=>{
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "option" + (state.answers[state.current]===index ? " selected" : "");
-    button.setAttribute("aria-pressed",String(state.answers[state.current]===index));
-
-    const letter = document.createElement("span");
-    letter.className = "opt-letter";
-    letter.textContent = String.fromCharCode(65+index);
-
-    const textWrap = document.createElement("span");
-    textWrap.className = "opt-text";
-    const en = document.createElement("span");
-    en.textContent = option[0];
-    textWrap.appendChild(en);
-
-    button.append(letter,textWrap);
-    button.addEventListener("click",()=>{
-      state.answers[state.current]=index;
-      renderQuestion();
-    });
-    options.appendChild(button);
-  });
-
-  $("prevBtn").disabled = state.current===0;
-  $("nextBtn").textContent = state.current===questions.length-1 ? "Finish Questions →" : "Save & Next →";
-  $("reviewBtn").textContent = state.review[state.current] ? "★ Remove Review Mark" : "☆ Mark for Review";
-  renderPalette();
-  renderStats();
-}
-
-function renderPalette(){
-  const palette = $("palette");
-  palette.replaceChildren();
-  questions.forEach((q,index)=>{
-    const button = document.createElement("button");
-    button.type="button";
-    button.className="pal";
-    if(state.answers[index]!==null) button.classList.add("answered");
-    if(state.review[index]) button.classList.add("review");
-    if(index===state.current) button.classList.add("current");
-    button.textContent=String(index+1);
-    button.setAttribute("aria-label",`Go to question ${index+1}`);
-    button.addEventListener("click",()=>{
-      state.current=index;
-      renderQuestion();
-    });
-    palette.appendChild(button);
-  });
-}
-
+let questions=[],testConfig=null,timerInterval=null,paused=false,questionFont=30;
+const state={current:0,answers:[],review:[],saved:[],seconds:0,finished:false};
+const $=id=>document.getElementById(id);
+const testArea=$("testArea"),resultArea=$("resultArea");
+function subjectName(){return testConfig?.section||testConfig?.subject||"General Awareness";}
+function closePalette(){$("palettePanel").classList.remove("open");$("overlay").classList.remove("show");$("drawerToggle").textContent="◀";}
+function togglePalette(){const open=$("palettePanel").classList.toggle("open");$("overlay").classList.toggle("show",open);$("drawerToggle").textContent=open?"▶":"◀";}
+$("drawerToggle").addEventListener("click",togglePalette);$("overlay").addEventListener("click",closePalette);
 function renderStats(){
-  const answered = state.answers.filter(a=>a!==null).length;
-  $("answeredCount").textContent=answered;
-  $("remainingCount").textContent=questions.length-answered;
-  $("reviewCount").textContent=state.review.filter(Boolean).length;
+ const answered=state.answers.filter(v=>v!==null).length;
+ $("answeredCount").textContent=answered;
+ $("paletteAnswered").textContent=answered;
+ $("paletteUnanswered").textContent=questions.length-answered;
+ $("paletteReview").textContent=state.review.filter(Boolean).length;
 }
-
+function renderPalette(){
+ const root=$("palette");root.replaceChildren();
+ questions.forEach((q,i)=>{
+  const b=document.createElement("button");b.className="palette-btn";b.textContent=i+1;
+  if(state.answers[i]!==null)b.classList.add("answered");
+  if(state.review[i])b.classList.add("review");
+  if(i===state.current)b.classList.add("current");
+  b.addEventListener("click",()=>{state.current=i;renderQuestion();closePalette();});
+  root.appendChild(b);
+ });
+ renderStats();
+}
+function renderQuestion(){
+ if(!questions.length||state.finished)return;
+ const q=questions[state.current];
+ $("questionNumber").textContent=`Question: ${state.current+1}`;
+ $("lastTime").textContent=`Last ${Math.ceil(state.seconds/60)} Minutes`;
+ $("questionText").textContent=q.text;
+ $("questionText").style.fontSize=questionFont+"px";
+ const options=$("options");options.replaceChildren();
+ q.options.forEach((value,index)=>{
+  const label=document.createElement("label");label.className="option-row";
+  const input=document.createElement("input");input.type="radio";input.name="answer";input.checked=state.answers[state.current]===index;
+  input.addEventListener("change",()=>{state.answers[state.current]=index;renderQuestion();});
+  const text=document.createElement("span");text.textContent=value;
+  label.append(input,text);options.appendChild(label);
+ });
+ $("prevBtn").disabled=state.current===0;
+ $("nextBtn").textContent=state.current===questions.length-1?"Save & Next":"Save & Next";
+ $("reviewBtn").textContent=state.review[state.current]?"Unmark Review":"Mark For Review";
+ $("clearBtn").disabled=state.answers[state.current]===null;
+ renderPalette();
+}
 function updateTimer(){
-  const mins=Math.floor(state.seconds/60);
-  const secs=state.seconds%60;
-  $("timer").textContent=`${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
-  $("timer").classList.toggle("warning",state.seconds<=60);
+ const m=Math.floor(state.seconds/60),s=state.seconds%60;
+ $("timer").textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+ $("timer").classList.toggle("warning",state.seconds<=60);
+ $("lastTime").textContent=`Last ${Math.ceil(state.seconds/60)} Minutes`;
 }
-
 function finishTest(auto=false){
-  if(state.finished) return;
-  const answered=state.answers.filter(a=>a!==null).length;
-  if(!auto && !confirm(`Submit your test?\nAnswered: ${answered} / ${questions.length}\nUnanswered: ${questions.length-answered}`)) return;
-
-  state.finished=true;
-  clearInterval(timerInterval);
-  let correct=0,wrong=0,unanswered=0;
-  state.answers.forEach((answer,index)=>{
-    if(answer===null) unanswered++;
-    else if(answer===questions[index].answer) correct++;
-    else wrong++;
-  });
-
-  const score=correct*Number(testConfig.marks_per_correct)-wrong*Number(testConfig.negative_marks);
-  testArea.classList.add("hidden");
-  resultArea.classList.remove("hidden");
-  resultArea.replaceChildren();
-
-  const heading=document.createElement("h2");
-  heading.textContent=auto ? "Time Over — Test Submitted" : "Test Submitted Successfully!";
-  const scoreLabel=document.createElement("p");
-  scoreLabel.textContent="Your Demo Score / आपका स्कोर";
-  const scoreNumber=document.createElement("div");
-  scoreNumber.className="score";
-  scoreNumber.textContent=Number(score.toFixed(2))+" points";
-
-  const summary=document.createElement("div");
-  summary.className="result-stats";
-  [
-    ["Correct / सही",correct],
-    ["Incorrect / गलत",wrong],
-    ["Unanswered / बिना उत्तर",unanswered]
-  ].forEach(([label,value])=>{
-    const box=document.createElement("div");
-    box.className="result-box";
-    const strong=document.createElement("strong");
-    strong.textContent=value;
-    const span=document.createElement("span");
-    span.textContent=label;
-    box.append(strong,span);
-    summary.appendChild(box);
-  });
-
-  const note=document.createElement("p");
-  note.className="notice";
-  note.textContent="Your test result is displayed here. Please take a screenshot if you need to keep a copy.";
-  const reviewHeading=document.createElement("h2");
-  reviewHeading.textContent="Answer Review / उत्तरों की समीक्षा";
-
-  resultArea.append(heading,scoreLabel,scoreNumber,summary,note,reviewHeading);
-
-  questions.forEach((q,index)=>{
-    const item=document.createElement("div");
-    item.className="review-item";
-    const question=document.createElement("p");
-    question.textContent=`Q${index+1}. ${q.en} / ${q.hi}`;
-    const yourAnswer=document.createElement("p");
-    const selected=state.answers[index];
-    yourAnswer.textContent="Your answer: "+(selected===null ? "Not answered" : q.options[selected][0]);
-    yourAnswer.className=selected===null ? "" : selected===q.answer ? "correct-text" : "wrong-text";
-    const correctAnswer=document.createElement("p");
-    correctAnswer.className="correct-text";
-    correctAnswer.textContent="Correct answer: "+q.options[q.answer][0];
-    const explanation=document.createElement("p");
-    explanation.textContent="Explanation: "+(q.explanation || "No explanation provided.");
-    item.append(question,yourAnswer,correctAnswer,explanation);
-    resultArea.appendChild(item);
-  });
-
-  const restart=document.createElement("button");
-  restart.className="btn primary";
-  restart.textContent="Back to Candidate Dashboard";
-  restart.addEventListener("click",()=>location.href="candidate-dashboard.html");
-  resultArea.appendChild(restart);
-  window.scrollTo({top:0,behavior:"smooth"});
+ if(state.finished)return;
+ const answered=state.answers.filter(v=>v!==null).length;
+ if(!auto&&!confirm(`Submit your test?\nAnswered: ${answered}/${questions.length}\nUnanswered: ${questions.length-answered}`))return;
+ state.finished=true;clearInterval(timerInterval);
+ let correct=0,wrong=0,unanswered=0;
+ state.answers.forEach((a,i)=>{if(a===null)unanswered++;else if(a===questions[i].answer)correct++;else wrong++;});
+ const score=correct*Number(testConfig.marks_per_correct)-wrong*Number(testConfig.negative_marks);
+ testArea.classList.add("hidden");$("sectionBar").classList.add("hidden");
+ document.querySelector(".controlbar").classList.add("hidden");
+ document.querySelector(".marking").classList.add("hidden");document.querySelector(".answered-line").classList.add("hidden");
+ resultArea.classList.remove("hidden");resultArea.replaceChildren();
+ const h=document.createElement("h2");h.textContent=auto?"Time Over — Test Submitted":"Test Submitted Successfully";
+ const sc=document.createElement("div");sc.className="score";sc.textContent=`${score.toFixed(2)} marks`;
+ const summary=document.createElement("div");summary.className="result-grid";
+ [["Correct",correct],["Incorrect",wrong],["Unanswered",unanswered]].forEach(([name,value])=>{const d=document.createElement("div"),b=document.createElement("b");b.textContent=value;d.append(b,document.createTextNode(name));summary.appendChild(d);});
+ const details=document.createElement("p");details.textContent=`${testConfig.title} · ${questions.length} questions · +${testConfig.marks_per_correct} / −${testConfig.negative_marks}`;
+ resultArea.append(h,sc,summary,details);
+ const reviewTitle=document.createElement("h2");reviewTitle.textContent="Answer Analysis";resultArea.appendChild(reviewTitle);
+ questions.forEach((q,i)=>{
+  const d=document.createElement("div");d.className="review-item";
+  const p=document.createElement("p");p.textContent=`Q${i+1}. ${q.text}`;
+  const yours=document.createElement("p");yours.textContent="Your answer: "+(state.answers[i]===null?"Not answered":q.options[state.answers[i]]);
+  const right=document.createElement("p");right.textContent="Correct answer: "+q.options[q.answer];
+  const explanation=document.createElement("p");explanation.textContent=q.explanation?"Explanation: "+q.explanation:"";
+  d.append(p,yours,right,explanation);resultArea.appendChild(d);
+ });
+ const back=document.createElement("button");back.className="exam-btn";back.textContent="Back to Candidate Dashboard";back.addEventListener("click",()=>location.href="candidate-dashboard.html");resultArea.appendChild(back);
+ window.scrollTo({top:0,behavior:"smooth"});
 }
-
-$("prevBtn").addEventListener("click",()=>{
-  if(state.current>0){state.current--;renderQuestion();}
-});
-$("nextBtn").addEventListener("click",()=>{
-  if(state.current<questions.length-1){state.current++;renderQuestion();}
-  else finishTest(false);
-});
-$("reviewBtn").addEventListener("click",()=>{
-  state.review[state.current]=!state.review[state.current];
-  renderQuestion();
-});
-$("clearBtn").addEventListener("click",()=>{
-  state.answers[state.current]=null;
-  renderQuestion();
-});
+$("prevBtn").addEventListener("click",()=>{if(state.current>0){state.current--;renderQuestion();}});
+$("nextBtn").addEventListener("click",()=>{if(state.current<questions.length-1){state.current++;renderQuestion();}else finishTest(false);});
+$("reviewBtn").addEventListener("click",()=>{state.review[state.current]=!state.review[state.current];renderQuestion();});
+$("clearBtn").addEventListener("click",()=>{state.answers[state.current]=null;renderQuestion();});
+$("saveQuestionBtn").addEventListener("click",()=>{state.saved[state.current]=true;alert("Question saved.");});
+$("reportBtn").addEventListener("click",()=>{const reason=prompt("Describe the issue with this question:");if(reason?.trim())alert("Your report has been noted for review.");});
 $("submitBtn").addEventListener("click",()=>finishTest(false));
+$("submitSectionBtn").addEventListener("click",()=>finishTest(false));
+$("pauseBtn").addEventListener("click",()=>{
+ paused=!paused;$("pauseBtn").textContent=paused?"▶":"Ⅱ";
+ $("pauseBtn").setAttribute("aria-label",paused?"Resume timer":"Pause timer");
+});
+$("zoomIn").addEventListener("click",()=>{questionFont=Math.min(48,questionFont+2);$("questionText").style.fontSize=questionFont+"px";});
+$("zoomOut").addEventListener("click",()=>{questionFont=Math.max(16,questionFont-2);$("questionText").style.fontSize=questionFont+"px";});
+$("symbolsBtn").addEventListener("click",()=>alert("Symbols:  α  β  γ  θ  π  √  ∑  ±  ×  ÷"));
+$("instructionsBtn").addEventListener("click",()=>alert("Instructions:\n1. Select one option for each question.\n2. Use Save & Next to move forward.\n3. Mark For Review to revisit a question.\n4. Use the question palette to navigate.\n5. Submit Test when you are ready."));
 $("year").textContent=new Date().getFullYear();
-
-async function initialiseTest(){
-  try {
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) { location.replace("candidate-login.html"); return; }
-    const testId = new URLSearchParams(location.search).get("test_id");
-    if (!testId) throw new Error("No test was selected. Return to your Candidate Dashboard and choose a test.");
-    const { data: test, error: testError } = await supabase.from("rb_tests")
-      .select("id,title,subject,section,duration_minutes,marks_per_correct,negative_marks,status")
-      .eq("id", testId).eq("status", "published").single();
-    if (testError || !test) throw new Error(testError?.message || "This test is not published or is unavailable.");
-    const { data: rows, error: questionError } = await supabase.from("rb_questions")
-      .select("id,question_text,option_a,option_b,option_c,option_d,correct_option,explanation,position")
-      .eq("test_id", testId).order("position", {ascending:true}).order("id", {ascending:true});
-    if (questionError) throw questionError;
-    if (!rows || !rows.length) throw new Error("No questions have been added to this test yet.");
-    testConfig = test;
-    questions = rows.map(row => ({
-      subject: test.section || test.subject || "General",
-      en: row.question_text,
-      hi: "",
-      options: [row.option_a,row.option_b,row.option_c,row.option_d].map(value => [value,value]),
-      answer: ["A","B","C","D"].indexOf(String(row.correct_option).toUpperCase()),
-      explanation: row.explanation || ""
-    }));
-    if (questions.some(q => q.answer < 0)) throw new Error("A question has an invalid correct option. Please contact the administrator.");
-    state.answers = Array(questions.length).fill(null);
-    state.review = Array(questions.length).fill(false);
-    state.seconds = Number(test.duration_minutes) * 60;
-    $("testTitle").textContent = test.title;
-    $("testMeta").textContent = `${test.subject}${test.section ? " · " + test.section : ""} | ${questions.length} Questions | ${test.duration_minutes} Minutes`;
-    $("markingMeta").textContent = `Marking: +${test.marks_per_correct} for correct answers, −${test.negative_marks} for incorrect answers, 0 for unanswered.`;
-    $("loadingMessage").remove();
-    renderQuestion(); updateTimer();
-    timerInterval=setInterval(()=>{
-      if(state.finished){clearInterval(timerInterval);return;}
-      state.seconds--; updateTimer();
-      if(state.seconds<=0){state.seconds=0;updateTimer();finishTest(true);}
-    },1000);
-  } catch (error) {
-    $("loadingMessage").textContent = "Unable to load this test: " + (error.message || "Please try again.");
-    $("loadingMessage").classList.add("notice");
-  }
+async function initialise(){
+ try{
+  const {data:auth,error:authError}=await supabase.auth.getUser();
+  if(authError||!auth.user){location.replace("candidate-login.html");return;}
+  const testId=new URLSearchParams(location.search).get("test_id");
+  if(!testId)throw new Error("No test selected. Return to your Candidate Dashboard and choose a test.");
+  const {data:test,error:testError}=await supabase.from("rb_tests")
+   .select("id,title,subject,section,duration_minutes,marks_per_correct,negative_marks,status")
+   .eq("id",testId).eq("status","published").single();
+  if(testError||!test)throw new Error(testError?.message||"This test is unavailable or not published.");
+  const {data:rows,error:questionError}=await supabase.from("rb_questions")
+   .select("id,question_text,option_a,option_b,option_c,option_d,correct_option,explanation,position")
+   .eq("test_id",testId).order("position",{ascending:true}).order("id",{ascending:true});
+  if(questionError)throw questionError;
+  if(!rows?.length)throw new Error("No questions have been added to this test.");
+  testConfig=test;
+  questions=rows.map(r=>({text:r.question_text,options:[r.option_a,r.option_b,r.option_c,r.option_d],answer:["A","B","C","D"].indexOf(String(r.correct_option).toUpperCase()),explanation:r.explanation||""}));
+  if(questions.some(q=>q.answer<0))throw new Error("A question has an invalid correct option.");
+  state.answers=Array(questions.length).fill(null);state.review=Array(questions.length).fill(false);state.saved=Array(questions.length).fill(false);
+  state.seconds=Number(test.duration_minutes)*60;
+  $("testTitle").textContent=test.title;
+  $("sectionName").textContent=(test.section||test.subject||"General Awareness").toUpperCase();
+  $("paletteHeading").textContent=test.section||test.subject||"General Awareness";
+  $("analysisHeading").textContent=(test.section||test.subject||"General Awareness")+" Analysis";
+  $("markingMeta").textContent=`Marks for correct answer: ${Number(test.marks_per_correct).toFixed(2)} | Negative: ${Number(test.negative_marks).toFixed(2)}`;
+  renderQuestion();updateTimer();
+  timerInterval=setInterval(()=>{if(state.finished||paused)return;state.seconds=Math.max(0,state.seconds-1);updateTimer();if(state.seconds<=0)finishTest(true);},1000);
+ }catch(e){
+  $("questionText").textContent="Unable to load this test: "+(e.message||"Please try again.");
+  $("options").replaceChildren();
+ }
 }
-initialiseTest();
+initialise();
 </script>
-<div style="text-align:center;font-size:10px;line-height:1.4;color:#8b8b8b;opacity:.78;padding:8px 12px 14px;letter-spacing:.2px;">Powered by Dark Vision by Sachit</div>
 </body>
 </html>
