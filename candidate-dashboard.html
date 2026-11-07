@@ -33,6 +33,14 @@
     .logout-btn:hover { background:#111; color:#fff; border-color:#111; }
     .message { margin-top:24px; padding:16px 18px; background:#f0f0f0; color:#333; border:1px solid #e4e4e4; border-radius:12px; line-height:1.6; }
     .message.error { background:#f5f5f5; color:#222; border-color:#cfcfcf; }
+    .tests-section { margin-top:34px; }
+    .tests-heading h2 { margin:0 0 7px; font-size:24px; letter-spacing:-.6px; }
+    .tests-heading p { margin:0 0 18px; color:var(--muted); font-size:14px; }
+    .tests-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; }
+    .test-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px; box-shadow:0 8px 28px rgba(0,0,0,.035); }
+    .test-card h3 { margin:0 0 8px; font-size:18px; }
+    .test-card p { color:#737373; font-size:13px; line-height:1.55; margin:6px 0; }
+    .test-card .btn { margin-top:12px; }
     footer { text-align:center; padding:28px 18px; color:#888; font-size:12px; border-top:1px solid var(--line); }
     @keyframes rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
@@ -109,6 +117,11 @@
       </section>
     </div>
 
+    <section class="tests-section" aria-labelledby="availableTestsHeading">
+      <div class="tests-heading"><div><h2 id="availableTestsHeading">Available Mock Tests</h2><p>Choose a published test to begin your practice.</p></div></div>
+      <div id="availableTests" class="tests-list" role="list"><p class="message">Loading available tests…</p></div>
+    </section>
+
     <div id="message" class="message" role="status">
       Account verify ho raha hai...
     </div>
@@ -124,6 +137,31 @@
     const welcomeText = document.getElementById("welcomeText");
     const message = document.getElementById("message");
     const logoutBtn = document.getElementById("logoutBtn");
+    const availableTests = document.getElementById("availableTests");
+
+    async function loadPublishedTests() {
+      const { data: tests, error } = await supabase.from("rb_tests")
+        .select("id,title,subject,section,duration_minutes,marks_per_correct,negative_marks,rb_exam_categories(name)")
+        .eq("status", "published").order("created_at", { ascending: false });
+      if (error) throw error;
+      if (!tests || tests.length === 0) {
+        availableTests.innerHTML = '<p class="message">No mock tests are published yet. Please check back soon.</p>';
+        return;
+      }
+      availableTests.replaceChildren();
+      tests.forEach(test => {
+        const card = document.createElement("article");
+        card.className = "test-card";
+        const heading = document.createElement("h3"); heading.textContent = test.title;
+        const category = document.createElement("p"); category.textContent = test.rb_exam_categories?.name || "Competitive Exam";
+        const subject = document.createElement("p"); subject.textContent = `${test.subject}${test.section ? " · " + test.section : ""}`;
+        const details = document.createElement("p"); details.textContent = `${test.duration_minutes} minutes · +${test.marks_per_correct} / −${test.negative_marks}`;
+        const start = document.createElement("a"); start.className = "btn"; start.textContent = "Start Test →";
+        start.href = `mock-test.html?test_id=${encodeURIComponent(test.id)}`;
+        card.append(heading, category, subject, details, start);
+        availableTests.appendChild(card);
+      });
+    }
 
     async function loadDashboard() {
       try {
@@ -141,10 +179,12 @@
         welcomeText.textContent = "Welcome, " + fullName + "!";
         message.textContent =
           "Aap successfully login hain. Dashboard use kar sakte hain.";
+        await loadPublishedTests();
 
       } catch (error) {
         message.textContent =
           "Account verify nahi ho paya. Internet connection check karke page reload karein.";
+        availableTests.textContent = "Tests could not be loaded. Please refresh the page.";
         message.classList.add("error");
       }
     }
