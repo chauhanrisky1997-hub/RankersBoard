@@ -27,7 +27,7 @@ button:focus-visible,select:focus-visible{outline:3px solid #91b3ff;outline-offs
 .sectionbar{padding:12px 20px 0;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
 .section-tab{border:0;background:var(--green);color:#fff;padding:12px 15px;font-size:18px;min-height:48px}
 .section-tab.active{background:#08733a}
-.section-tab.subject{display:block;width:max-content;max-width:100%;flex-basis:100%;text-align:left;margin-top:6px}
+.section-tab.subject{display:block;width:max-content;max-width:100%;text-align:left;margin-top:6px}
 .controlbar{padding:13px 20px 8px;display:flex;gap:10px;flex-wrap:wrap}
 .exam-btn{border:0;background:var(--blue);color:#fff;padding:11px 15px;min-height:48px;font-size:18px;font-weight:700}
 .exam-btn:disabled{opacity:.45;cursor:not-allowed}
@@ -71,7 +71,9 @@ button:focus-visible,select:focus-visible{outline:3px solid #91b3ff;outline-offs
 footer{text-align:center;color:#888;font-size:11px;padding:15px}
 @media(max-width:800px){
  .topline{padding:9px 12px;gap:7px;min-height:78px}
- .exam-title{font-size:16px;min-width:100px}
+ .exam-title{font-size:16px;min-width:75px;text-align:left}
+ .zoom-actions{gap:6px}
+ .fullscreen{display:none}
  .top-actions{gap:7px}
  .zoom{height:54px;min-width:48px;font-size:23px}
  .pause{height:54px;width:54px}
@@ -83,12 +85,13 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
  .section-tab{padding:10px 14px;font-size:17px;min-height:44px}
  .controlbar{padding:12px 20px 7px;gap:9px}
  .exam-btn{font-size:17px;min-height:47px;padding:9px 13px}
- .marking{font-size:18px;padding:8px 20px 0}
- .answered-line{font-size:24px;padding:8px 20px 10px}
+ .summary-line{padding:8px 20px 10px;display:block}
+ .marking{font-size:18px;display:block}
+ .answered-line{font-size:24px;padding-top:7px;display:block}
  .exam-layout{display:block;padding:0 20px 24px}
  .question-area{min-height:500px}
  .question-head{font-size:22px;padding:12px 20px}
- .question-content{padding:26px 22px;font-size:clamp(22px,4.6vw,30px);line-height:1.72}
+ .question-content{padding:24px 22px;font-size:clamp(21px,4.3vw,28px);line-height:1.65}
  .option-row{font-size:20px}
  .palette-panel{display:none;position:fixed;z-index:50;top:28%;right:0;bottom:0;width:min(82vw,430px);overflow:auto;border:1px solid #ccc;box-shadow:0 0 0 999px #0003}
  .palette-panel.open{display:block}
@@ -114,10 +117,13 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
 </head>
 <body>
 <header class="topline">
-  <div class="exam-title" id="testTitle">Loading test…</div>
-  <div class="top-actions">
+  <div class="zoom-actions">
     <button class="zoom" id="zoomIn" aria-label="Zoom in">(+)</button>
     <button class="zoom" id="zoomOut" aria-label="Zoom out">(−)</button>
+  </div>
+  <div class="exam-title" id="testTitle">Loading test…</div>
+  <div class="top-actions">
+    <button class="fullscreen" id="fullscreenBtn">Show Fullscreen</button>
     <button class="pause" id="pauseBtn" aria-label="Pause timer">Ⅱ</button>
     <div class="timerbox"><div class="timerlabel">Time Left</div><div class="timer" id="timer">--:--</div></div>
   </div>
@@ -127,10 +133,7 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
   <button id="instructionsBtn">INSTRUCTIONS</button>
 </nav>
 <div class="sectionbar" id="sectionBar">
-  <button class="section-tab active" id="sectionLetter">A</button>
-  <button class="section-tab" id="sectionB" disabled>B</button>
-  <button class="section-tab" id="sectionC" disabled>C</button>
-  <button class="section-tab subject" id="sectionName">LOADING SECTION</button>
+  <button class="section-tab subject active" id="sectionName">LOADING SUBJECT</button>
 </div>
 <div class="controlbar">
   <button class="exam-btn" id="prevBtn">Previous</button>
@@ -140,8 +143,10 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
   <button class="exam-btn" id="submitSectionBtn">Submit Section</button>
   <button class="exam-btn" id="submitBtn">Submit Test</button>
 </div>
-<div class="marking" id="markingMeta">Marks for correct answer: — | Negative: —</div>
-<div class="answered-line">Total Questions Answered: <strong id="answeredCount">0</strong></div>
+<div class="summary-line">
+  <span class="marking" id="markingMeta">Marks for correct answer: — | Negative: —</span>
+  <span class="answered-line">Total Questions Answered: <strong id="answeredCount">0</strong></span>
+</div>
 
 <main id="testArea">
   <div class="exam-layout">
@@ -275,6 +280,16 @@ $("submitSectionBtn").addEventListener("click",()=>finishTest(false));
 $("pauseBtn").addEventListener("click",()=>{
  paused=!paused;$("pauseBtn").textContent=paused?"▶":"Ⅱ";
  $("pauseBtn").setAttribute("aria-label",paused?"Resume timer":"Pause timer");
+});
+$("fullscreenBtn").addEventListener("click",async()=>{
+ try{
+  if(!document.fullscreenElement) await document.documentElement.requestFullscreen();
+  else await document.exitFullscreen();
+  $("fullscreenBtn").textContent=document.fullscreenElement?"Exit Fullscreen":"Show Fullscreen";
+ }catch(e){alert("Fullscreen is not available in this browser.");}
+});
+document.addEventListener("fullscreenchange",()=>{
+ $("fullscreenBtn").textContent=document.fullscreenElement?"Exit Fullscreen":"Show Fullscreen";
 });
 $("zoomIn").addEventListener("click",()=>{questionFont=Math.min(48,questionFont+2);$("questionText").style.fontSize=questionFont+"px";});
 $("zoomOut").addEventListener("click",()=>{questionFont=Math.max(16,questionFont-2);$("questionText").style.fontSize=questionFont+"px";});
