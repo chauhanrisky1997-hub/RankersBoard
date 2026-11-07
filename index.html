@@ -9,13 +9,13 @@
 
   <style>
     :root {
-      --navy: #101b35;
-      --blue: #315efb;
-      --light-blue: #edf2ff;
-      --text: #172033;
-      --muted: #657087;
+      --navy: #111111;
+      --blue: #111111;
+      --light-blue: #f1f1f1;
+      --text: #171717;
+      --muted: #737373;
       --white: #ffffff;
-      --border: #e7eaf1;
+      --border: #e5e5e5;
       --green: #15966a;
     }
 
@@ -60,7 +60,7 @@
       z-index: 100;
       background: rgba(255, 255, 255, 0.98);
       border-bottom: 1px solid var(--border);
-      box-shadow: 0 3px 16px rgba(16, 27, 53, 0.035);
+      box-shadow: 0 3px 16px rgba(0, 0, 0, 0.035);
     }
 
     .navbar {
@@ -88,9 +88,16 @@
       width: 40px;
       height: 40px;
       border-radius: 12px;
-      color: white;
-      background: var(--blue);
+      color: #111111;
+      background: #ffffff;
+      border: 1.5px solid #111111;
       font-size: 20px;
+    }
+
+    .logo-mark svg {
+      width: 25px;
+      height: 25px;
+      display: block;
     }
 
     .nav-links {
@@ -126,19 +133,19 @@
     }
 
     .btn:hover {
-      background: #2449d8;
+      background: #333333;
       transform: translateY(-1px);
     }
 
     .btn-outline {
       background: white;
       color: var(--navy);
-      border-color: #dce2ef;
+      border-color: #d6d6d6;
     }
 
     .btn-outline:hover {
       color: var(--blue);
-      background: #f7f8ff;
+      background: #f2f2f2;
     }
 
     /* MORE DROPDOWN */
@@ -183,7 +190,7 @@
       background: white;
       border: 1px solid var(--border);
       border-radius: 14px;
-      box-shadow: 0 16px 40px rgba(16, 27, 53, 0.15);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
       z-index: 300;
       opacity: 0;
       visibility: hidden;
@@ -233,10 +240,10 @@
       justify-content: center;
       gap: 8px;
       padding: 10px 13px;
-      border: 1px solid var(--blue);
-      border-radius: 9px;
-      background: var(--blue);
-      color: white;
+      border: 1px solid #171717;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #171717;
       font-size: 12px;
       font-weight: 700;
       white-space: nowrap;
@@ -245,7 +252,9 @@
     }
 
     #candidate-nav .login-btn:hover {
-      background: #2449d8;
+      background: #171717;
+      color: #ffffff;
+      transform: translateY(-1px);
     }
 
     #candidate-nav .dashboard-toggle {
@@ -261,7 +270,7 @@
       background: white;
       border: 1px solid var(--border);
       border-radius: 13px;
-      box-shadow: 0 16px 40px rgba(16, 27, 53, 0.16);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
@@ -319,8 +328,8 @@
       padding: 84px 0 76px;
       overflow: hidden;
       background:
-        radial-gradient(ellipse at 85% 20%, #dce6ff 0, transparent 34%),
-        linear-gradient(135deg, #f7f9ff, #ffffff 65%);
+        radial-gradient(ellipse at 85% 20%, #f0f0f0 0, transparent 34%),
+        linear-gradient(135deg, #fafafa, #ffffff 65%);
     }
 
     .hero-grid {
@@ -335,9 +344,9 @@
       align-items: center;
       gap: 8px;
       padding: 7px 12px;
-      border: 1px solid #dbe4ff;
+      border: 1px solid #e5e5e5;
       background: #ffffff;
-      color: #3150bd;
+      color: #222222;
       border-radius: 30px;
       font-size: 12px;
       font-weight: 800;
@@ -793,7 +802,17 @@
 @media(prefers-reduced-motion:reduce){.exam-emblem,.orbit,.art-glow,.emblem-orbit{animation:none!important}}
 </style>
 
-<style id="rb-no-blue-final">button,input[type="submit"],input[type="button"],.btn,.login-btn,.switch,.primary-btn,.cta,.action-button{background:#111!important;background-image:none!important;border-color:#111!important;color:#fff!important}button.secondary,.btn-outline,.secondary-btn{background:#fff!important;color:#171717!important;border:1px solid #dedede!important}a:not(.btn):not(.logo){color:#222!important}</style>
+<style id="rb-monochrome-finish">
+      button,input[type="submit"],input[type="button"],.btn,.switch,.primary-btn,.cta,.action-button {
+        background:#111!important;background-image:none!important;border-color:#111!important;color:#fff!important;
+      }
+      button.secondary,.btn-outline,.secondary-btn,#candidate-nav .login-btn {
+        background:#fff!important;color:#171717!important;border:1px solid #dedede!important;
+      }
+      #candidate-nav .login-btn:hover {background:#111!important;color:#fff!important;border-color:#111!important}
+      .logo-mark {background:#fff!important;color:#111!important;border:1.5px solid #111!important}
+      a:not(.btn):not(.logo){color:#222!important}
+    </style>
 </head>
 
 <body>
@@ -803,7 +822,13 @@
     <div class="container navbar">
 
       <a class="logo" href="index.html" aria-label="RankersBoard home">
-        <span class="logo-mark">🎓</span>
+        <span class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" role="img" focusable="false">
+            <path d="M20 3 37 20 20 37 3 20 20 3Z" fill="none" stroke="currentColor" stroke-width="2.8"/>
+            <path d="M20 10 30 20 20 30 10 20 20 10Z" fill="currentColor"/>
+            <path d="M20 15v10" stroke="#fff" stroke-width="2"/>
+          </svg>
+        </span>
         <span>RankersBoard</span>
       </a>
 
@@ -993,7 +1018,13 @@
     <div class="container footer-inner">
 
       <a class="logo" href="index.html">
-        <span class="logo-mark">🎓</span>
+        <span class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" role="img" focusable="false">
+            <path d="M20 3 37 20 20 37 3 20 20 3Z" fill="none" stroke="currentColor" stroke-width="2.8"/>
+            <path d="M20 10 30 20 20 30 10 20 20 10Z" fill="currentColor"/>
+            <path d="M20 15v10" stroke="#fff" stroke-width="2"/>
+          </svg>
+        </span>
         <span>RankersBoard</span>
       </a>
 
