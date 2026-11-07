@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101b35">
-<title>SSC CGL Mock Test | RankersBoard</title>
+<title>Mock Test | RankersBoard</title>
 <style>
 :root{--navy:#101b35;--blue:#315efb;--bg:#f3f5fa;--border:#e1e6ef;--muted:#647087;--green:#16865d;--red:#d93649}
 *{box-sizing:border-box}
@@ -82,12 +82,13 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
 
 <main class="wrap">
   <section class="intro">
-    <h1>SSC CGL Mock Test — Demo 01</h1>
-    <p>Hindi + English | 10 Questions | 10 Minutes</p>
-    <p>Demo marking: +2 for correct answers, −0.5 for incorrect answers, 0 for unanswered.</p>
+    <h1 id="testTitle">Loading test…</h1>
+    <p id="testMeta">Please wait while your test loads.</p>
+    <p id="markingMeta">Marking scheme will appear here.</p>
   </section>
 
   <section id="testArea">
+    <p id="loadingMessage" class="panel">Verifying your login and loading questions…</p>
     <div class="test-grid">
       <div>
         <div class="panel stats">
@@ -140,107 +141,18 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px}
 
 <footer>© <span id="year"></span> RankersBoard · SSC CGL Practice</footer>
 
-<script>
+<script type="module">
 "use strict";
+import { supabase } from "./supabase-client.js";
 
-const questions = [
-  {
-    subject:"Reasoning / तर्कशक्ति",
-    en:"Find the next number: 2, 6, 12, 20, 30, ?",
-    hi:"अगली संख्या ज्ञात कीजिए: 2, 6, 12, 20, 30, ?",
-    options:[["36","36"],["40","40"],["42","42"],["44","44"]],
-    answer:2,
-    explanation:"The differences are 4, 6, 8, 10, then 12. So the next number is 42. / अंतर 4, 6, 8, 10 और फिर 12 हैं। इसलिए अगली संख्या 42 है।"
-  },
-  {
-    subject:"Reasoning / तर्कशक्ति",
-    en:"If CAT is coded as DBU, how is DOG coded using the same rule?",
-    hi:"यदि CAT को DBU लिखा जाता है, तो उसी नियम से DOG को कैसे लिखेंगे?",
-    options:[["EPH","EPH"],["EOG","EOG"],["DPH","DPH"],["FPH","FPH"]],
-    answer:0,
-    explanation:"Each letter moves one step forward: D→E, O→P, G→H. / हर अक्षर के बाद वाला अक्षर लिया गया है।"
-  },
-  {
-    subject:"Quantitative Aptitude / गणित",
-    en:"What is 25% of 240?",
-    hi:"240 का 25% कितना है?",
-    options:[["40","40"],["50","50"],["60","60"],["80","80"]],
-    answer:2,
-    explanation:"25% = 1/4, and 240 ÷ 4 = 60. / 25% = 1/4, इसलिए 240 ÷ 4 = 60।"
-  },
-  {
-    subject:"Quantitative Aptitude / गणित",
-    en:"A book costs ₹400. Its price increases by 10%. What is the new price?",
-    hi:"एक किताब की कीमत ₹400 है। कीमत में 10% की वृद्धि होती है। नई कीमत क्या होगी?",
-    options:[["₹410","₹410"],["₹420","₹420"],["₹440","₹440"],["₹450","₹450"]],
-    answer:2,
-    explanation:"10% of 400 = 40; new price = 400 + 40 = ₹440. / 400 का 10% = 40; नई कीमत ₹440 है।"
-  },
-  {
-    subject:"English / अंग्रेज़ी",
-    en:"Choose the synonym of “Rapid”.",
-    hi:"“Rapid” का समानार्थी शब्द चुनिए।",
-    options:[["Slow","धीमा"],["Quick","तेज़"],["Weak","कमज़ोर"],["Late","देर से"]],
-    answer:1,
-    explanation:"Rapid means quick or fast. / Rapid का अर्थ तेज़ होता है।"
-  },
-  {
-    subject:"English / अंग्रेज़ी",
-    en:"Choose the correct sentence.",
-    hi:"सही वाक्य चुनिए।",
-    options:[
-      ["She go to school daily.","वह रोज़ स्कूल जाती है।"],
-      ["She going to school daily.","वह रोज़ स्कूल जाती है।"],
-      ["She goes to school daily.","वह रोज़ स्कूल जाती है।"],
-      ["She gone to school daily.","वह रोज़ स्कूल जाती है।"]
-    ],
-    answer:2,
-    explanation:"With she/he/it in the simple present, the verb usually takes -s or -es. / Simple Present में She के साथ सामान्यतः verb में -s या -es लगता है।"
-  },
-  {
-    subject:"General Awareness / सामान्य ज्ञान",
-    en:"What is the capital of India?",
-    hi:"भारत की राजधानी क्या है?",
-    options:[["Mumbai / मुंबई","Mumbai / मुंबई"],["New Delhi / नई दिल्ली","New Delhi / नई दिल्ली"],["Kolkata / कोलकाता","Kolkata / कोलकाता"],["Chennai / चेन्नई","Chennai / चेन्नई"]],
-    answer:1,
-    explanation:"New Delhi is the capital of India. / नई दिल्ली भारत की राजधानी है।"
-  },
-  {
-    subject:"General Awareness / सामान्य ज्ञान",
-    en:"Which planet is known as the Red Planet?",
-    hi:"किस ग्रह को लाल ग्रह कहा जाता है?",
-    options:[["Venus / शुक्र","Venus / शुक्र"],["Jupiter / बृहस्पति","Jupiter / बृहस्पति"],["Mars / मंगल","Mars / मंगल"],["Mercury / बुध","Mercury / बुध"]],
-    answer:2,
-    explanation:"Mars is commonly known as the Red Planet. / मंगल को लाल ग्रह कहा जाता है।"
-  },
-  {
-    subject:"Quantitative Aptitude / गणित",
-    en:"The average of 10, 20 and 30 is:",
-    hi:"10, 20 और 30 का औसत है:",
-    options:[["15","15"],["20","20"],["25","25"],["30","30"]],
-    answer:1,
-    explanation:"Average = (10 + 20 + 30) ÷ 3 = 20. / औसत = (10 + 20 + 30) ÷ 3 = 20।"
-  },
-  {
-    subject:"Reasoning / तर्कशक्ति",
-    en:"Choose the odd one out.",
-    hi:"असंगत विकल्प चुनिए।",
-    options:[
-      ["Square / वर्ग","Square / वर्ग"],
-      ["Triangle / त्रिभुज","Triangle / त्रिभुज"],
-      ["Circle / वृत्त","Circle / वृत्त"],
-      ["Rose / गुलाब","Rose / गुलाब"]
-    ],
-    answer:3,
-    explanation:"Rose is a flower; the other options are geometric shapes. / गुलाब एक फूल है, जबकि बाकी ज्यामितीय आकृतियाँ हैं।"
-  }
-];
+let questions = [];
+let testConfig = null;
 
 const state = {
   current:0,
-  answers:Array(questions.length).fill(null),
-  review:Array(questions.length).fill(false),
-  seconds:600,
+  answers:[],
+  review:[],
+  seconds:0,
   finished:false
 };
 
@@ -262,7 +174,8 @@ function renderQuestion(){
   $("questionText").appendChild(english);
 
   const hindi = document.createElement("span");
-  hindi.textContent = q.hi;
+  hindi.textContent = q.hi || "";
+  if (!q.hi) hindi.hidden = true;
   hindi.className = "hi";
   $("questionText").appendChild(hindi);
 
@@ -348,7 +261,7 @@ function finishTest(auto=false){
     else wrong++;
   });
 
-  const score=correct*2-wrong*0.5;
+  const score=correct*Number(testConfig.marks_per_correct)-wrong*Number(testConfig.negative_marks);
   testArea.classList.add("hidden");
   resultArea.classList.remove("hidden");
   resultArea.replaceChildren();
@@ -359,7 +272,7 @@ function finishTest(auto=false){
   scoreLabel.textContent="Your Demo Score / आपका स्कोर";
   const scoreNumber=document.createElement("div");
   scoreNumber.className="score";
-  scoreNumber.textContent=Number(score.toFixed(2))+" / "+(questions.length*2);
+  scoreNumber.textContent=Number(score.toFixed(2))+" points";
 
   const summary=document.createElement("div");
   summary.className="result-stats";
@@ -380,7 +293,7 @@ function finishTest(auto=false){
 
   const note=document.createElement("p");
   note.className="notice";
-  note.textContent="This is a practice demo. Your result is shown in this browser only and is not saved to a student account.";
+  note.textContent="Your test result is displayed here. Please take a screenshot if you need to keep a copy.";
   const reviewHeading=document.createElement("h2");
   reviewHeading.textContent="Answer Review / उत्तरों की समीक्षा";
 
@@ -393,21 +306,21 @@ function finishTest(auto=false){
     question.textContent=`Q${index+1}. ${q.en} / ${q.hi}`;
     const yourAnswer=document.createElement("p");
     const selected=state.answers[index];
-    yourAnswer.textContent="Your answer / आपका उत्तर: "+(selected===null ? "Not answered / उत्तर नहीं दिया" : q.options[selected][0]);
+    yourAnswer.textContent="Your answer: "+(selected===null ? "Not answered" : q.options[selected][0]);
     yourAnswer.className=selected===null ? "" : selected===q.answer ? "correct-text" : "wrong-text";
     const correctAnswer=document.createElement("p");
     correctAnswer.className="correct-text";
-    correctAnswer.textContent="Correct answer / सही उत्तर: "+q.options[q.answer][0];
+    correctAnswer.textContent="Correct answer: "+q.options[q.answer][0];
     const explanation=document.createElement("p");
-    explanation.textContent="Explanation / व्याख्या: "+q.explanation;
+    explanation.textContent="Explanation: "+(q.explanation || "No explanation provided.");
     item.append(question,yourAnswer,correctAnswer,explanation);
     resultArea.appendChild(item);
   });
 
   const restart=document.createElement("button");
   restart.className="btn primary";
-  restart.textContent="Restart Practice Test";
-  restart.addEventListener("click",()=>location.reload());
+  restart.textContent="Back to Candidate Dashboard";
+  restart.addEventListener("click",()=>location.href="candidate-dashboard.html");
   resultArea.appendChild(restart);
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -430,18 +343,50 @@ $("clearBtn").addEventListener("click",()=>{
 $("submitBtn").addEventListener("click",()=>finishTest(false));
 $("year").textContent=new Date().getFullYear();
 
-renderQuestion();
-updateTimer();
-timerInterval=setInterval(()=>{
-  if(state.finished){clearInterval(timerInterval);return;}
-  state.seconds--;
-  updateTimer();
-  if(state.seconds<=0){
-    state.seconds=0;
-    updateTimer();
-    finishTest(true);
+async function initialiseTest(){
+  try {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData.user) { location.replace("candidate-login.html"); return; }
+    const testId = new URLSearchParams(location.search).get("test_id");
+    if (!testId) throw new Error("No test was selected. Return to your Candidate Dashboard and choose a test.");
+    const { data: test, error: testError } = await supabase.from("rb_tests")
+      .select("id,title,subject,section,duration_minutes,marks_per_correct,negative_marks,status")
+      .eq("id", testId).eq("status", "published").single();
+    if (testError || !test) throw new Error(testError?.message || "This test is not published or is unavailable.");
+    const { data: rows, error: questionError } = await supabase.from("rb_questions")
+      .select("id,question_text,option_a,option_b,option_c,option_d,correct_option,explanation,position")
+      .eq("test_id", testId).order("position", {ascending:true}).order("id", {ascending:true});
+    if (questionError) throw questionError;
+    if (!rows || !rows.length) throw new Error("No questions have been added to this test yet.");
+    testConfig = test;
+    questions = rows.map(row => ({
+      subject: test.section || test.subject || "General",
+      en: row.question_text,
+      hi: "",
+      options: [row.option_a,row.option_b,row.option_c,row.option_d].map(value => [value,value]),
+      answer: ["A","B","C","D"].indexOf(String(row.correct_option).toUpperCase()),
+      explanation: row.explanation || ""
+    }));
+    if (questions.some(q => q.answer < 0)) throw new Error("A question has an invalid correct option. Please contact the administrator.");
+    state.answers = Array(questions.length).fill(null);
+    state.review = Array(questions.length).fill(false);
+    state.seconds = Number(test.duration_minutes) * 60;
+    $("testTitle").textContent = test.title;
+    $("testMeta").textContent = `${test.subject}${test.section ? " · " + test.section : ""} | ${questions.length} Questions | ${test.duration_minutes} Minutes`;
+    $("markingMeta").textContent = `Marking: +${test.marks_per_correct} for correct answers, −${test.negative_marks} for incorrect answers, 0 for unanswered.`;
+    $("loadingMessage").remove();
+    renderQuestion(); updateTimer();
+    timerInterval=setInterval(()=>{
+      if(state.finished){clearInterval(timerInterval);return;}
+      state.seconds--; updateTimer();
+      if(state.seconds<=0){state.seconds=0;updateTimer();finishTest(true);}
+    },1000);
+  } catch (error) {
+    $("loadingMessage").textContent = "Unable to load this test: " + (error.message || "Please try again.");
+    $("loadingMessage").classList.add("notice");
   }
-},1000);
+}
+initialiseTest();
 </script>
 <div style="text-align:center;font-size:10px;line-height:1.4;color:#8b8b8b;opacity:.78;padding:8px 12px 14px;letter-spacing:.2px;">Powered by Dark Vision by Sachit</div>
 </body>
