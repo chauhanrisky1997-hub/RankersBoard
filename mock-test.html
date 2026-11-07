@@ -113,10 +113,162 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
  .option-row{font-size:18px}
  .result-grid{grid-template-columns:1fr 1fr}
 }
+
+/* Pre-exam instruction flow */
+.intro-screen{position:fixed;inset:0;z-index:200;background:#fff;color:#222;display:flex;flex-direction:column;font-family:Arial,Helvetica,sans-serif}
+.intro-top{height:48px;min-height:48px;border-bottom:1px solid #ddd;display:flex;justify-content:flex-end;align-items:center;padding:0 18px;font-size:13px;gap:8px}
+.intro-top select{border:0;background:#fff;padding:5px;color:#333}
+.intro-content{flex:1;min-height:0;overflow:auto;padding:24px 24px 18px}
+.intro-heading{font-size:20px;line-height:1.2;color:#174a83;font-weight:700;margin:2px 0 16px}
+.symbol-table{width:100%;border-collapse:collapse;font-size:14px}
+.symbol-table th{background:#d8d0bd;color:#111;text-align:left;padding:7px 10px;border:1px solid #d5d5d5}
+.symbol-table td{border:1px solid #d5d5d5;padding:5px 10px;color:#174a83;font-weight:700}
+.symbol-table td:first-child{width:16%;text-align:center;color:#222;font-size:16px}
+.symbol-radio{display:inline-block;width:14px;height:14px;border:2px solid #aaa;border-radius:50%;vertical-align:middle}
+.symbol-radio.chosen{border-color:#1683d8;background:radial-gradient(circle,#1683d8 0 4px,white 4px)}
+.symbol-number{display:inline-block;background:#214fd2;color:white;border-radius:3px;padding:0px 3px;font-weight:700}
+.symbol-number.green{background:#168044}.symbol-number.red{background:#c62828}.symbol-number.yellow{background:#ffe600;color:#111}
+.symbol-action{display:inline-block;background:#3167c6;color:white;border-radius:5px;padding:5px 14px;min-width:135px;text-align:center;font-weight:400}
+.symbol-action.grey{background:#e5e0d5;color:#222}
+.intro-marks{font-size:12px;line-height:1.7;margin-top:16px;color:#444}
+.intro-footer{border-top:1px solid #ddd;min-height:58px;display:flex;align-items:center;justify-content:space-between;padding:8px 18px;background:#fff}
+.intro-footer button{border:0;background:#39b8e7;color:white;padding:9px 20px;font-size:14px}
+.intro-footer button:disabled{opacity:.5;cursor:not-allowed}
+.terms-frame{border:1px solid #777;height:100%;max-height:calc(100vh - 160px);overflow:auto;padding:0 10px}
+.terms-title{background:#d8d0bd;border:1px solid #777;padding:7px 10px;font-weight:700;font-size:16px}
+.terms-section{border:1px solid #777;border-top:0;padding:8px 12px;font-size:13px;line-height:1.35}
+.terms-section h3{font-size:15px;margin:0 0 6px}
+.terms-section ul{margin:4px 0 4px 20px;padding:0}
+.terms-section li{margin:4px 0}
+.terms-table{border-collapse:collapse;width:80%;margin:8px 0;font-size:12px}
+.terms-table th,.terms-table td{border:1px solid #555;padding:4px 7px;text-align:left}
+.terms-table th{background:#ddd}
+.ready-agreement{font-size:12px;line-height:1.25;display:flex;align-items:flex-start;gap:7px;max-width:calc(100% - 190px)}
+.ready-agreement input{margin-top:2px;flex-shrink:0}
+@media(max-width:700px){
+ .intro-content{padding:15px 12px}
+ .intro-heading{font-size:17px}
+ .symbol-table{font-size:11px}
+ .symbol-table td{padding:5px 4px}
+ .symbol-table td:first-child{width:20%}
+ .intro-footer{gap:8px;padding:8px 10px}
+ .intro-footer button{padding:9px 12px;font-size:13px}
+ .ready-agreement{font-size:10px;max-width:calc(100% - 125px)}
+ .terms-frame{max-height:calc(100vh - 160px);padding:0 5px}
+ .terms-section{font-size:11px;padding:7px}
+ .terms-section h3{font-size:13px}
+ .terms-table{width:100%;font-size:10px}
+}
+
 </style>
 </head>
 <body>
-<header class="topline">
+
+<section class="intro-screen hidden" id="introScreen" aria-label="Before you begin the test">
+  <div class="intro-top">
+    <label for="introLanguage">Select Language:</label>
+    <select id="introLanguage"><option>English</option><option>Hindi</option></select>
+    <span aria-hidden="true">✖</span>
+  </div>
+
+  <div class="intro-content" id="symbolsIntro">
+    <h2 class="intro-heading">The different symbols used in the next pages are shown below. Please go through them and understand their meaning before you start the test.</h2>
+    <table class="symbol-table">
+      <thead><tr><th style="width:16%;text-align:center">Symbol</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><span class="symbol-radio"></span></td><td>Option Not chosen</td></tr>
+        <tr><td><span class="symbol-radio chosen"></span></td><td>Option chosen as correct (By clicking on it again you can delete your option and choose another option if desired.)</td></tr>
+        <tr><td><span class="symbol-number">12</span></td><td>Question number shown in blue color indicates that you have not yet attempted the question.</td></tr>
+        <tr><td><span class="symbol-number green">13</span></td><td>Question number shown in green color indicates that you have answered the question.</td></tr>
+        <tr><td><span class="symbol-number red">14</span><br>▲</td><td>You have not yet answered the question, but marked it for coming back for review later, if time permits.</td></tr>
+        <tr><td><span class="symbol-number yellow">15</span><br>▲</td><td>You have answered the question, but marked it for review later, if time permits.</td></tr>
+        <tr><td><span class="symbol-action">Save &amp; Next</span></td><td>Clicking on this will take you to the next question.</td></tr>
+        <tr><td><span class="symbol-action">Previous</span></td><td>Clicking on this will take you to the previous question.</td></tr>
+        <tr><td><span class="symbol-action">Mark for Review</span></td><td>By clicking on this button, you can mark the question for review later. Please note that if you answer the question and mark for review, the question will be treated as answered and evaluated even if you do not review it.</td></tr>
+        <tr><td><span class="symbol-action grey">Unmark Review</span></td><td>By clicking on this button, you can unmark the question for review.</td></tr>
+      </tbody>
+    </table>
+    <div class="intro-marks" id="introMarks">
+      Right answer : 2 marks<br>Wrong Answer: -0.5 marks<br>Not attempted: 0 marks
+    </div>
+  </div>
+
+  <div class="intro-content hidden" id="termsIntro">
+    <div class="terms-frame">
+      <div class="terms-title">Instructions, Terms &amp; Conditions</div>
+      <div class="terms-section">
+        <h3>1. Exam Overview / परीक्षा का संक्षिप्त विवरण</h3>
+        <ul>
+          <li>Duration: <b id="termsDuration">—</b> minutes / समयावधि: <b id="termsDurationHindi">—</b> मिनट</li>
+          <li>Total Questions: <b id="termsQuestions">—</b></li>
+          <li>Negative Marking: <b id="termsNegative">—</b> marks deducted for each wrong answer.</li>
+          <li>Number of Sections displayed at any time: 1</li>
+        </ul>
+        <table class="terms-table"><thead><tr><th>Section</th><th>Subject</th><th>Number of Questions</th><th>Maximum Marks</th></tr></thead>
+        <tbody><tr><td>Part - A</td><td id="termsSubject">Selected Subject</td><td id="termsQuestionCount">—</td><td id="termsMaxMarks">—</td></tr></tbody></table>
+      </div>
+      <div class="terms-section">
+        <h3>2. Timing &amp; Submission / समय और उत्तर जमा करना</h3>
+        <ul>
+          <li>The timer (top right) is server-controlled; remaining time appears top right.</li>
+          <li>The exam auto-submits when time ends—no manual submission required.</li>
+        </ul>
+      </div>
+      <div class="terms-section">
+        <h3>3. Language / भाषा</h3>
+        <ul>
+          <li>Questions are displayed in the language provided with the test. Use the language selector if available.</li>
+          <li>Language selection cannot change the question content if a translated version has not been provided.</li>
+        </ul>
+      </div>
+      <div class="terms-section">
+        <h3>4. Navigation / नेविगेशन (परीक्षा में चलना)</h3>
+        <ul>
+          <li>Use Previous or Save &amp; Next to move between questions; use Mark for Review to flag questions you wish to revisit later.</li>
+          <li>After the last question, Save &amp; Next moves to the next question or completes the test.</li>
+        </ul>
+      </div>
+      <div class="terms-section">
+        <h3>5. Answering / उत्तर देना</h3>
+        <ul>
+          <li>Each question has four options, out of which only one is correct. Select or change your answer at any time before saving.</li>
+          <li>Answers are saved only after clicking Save &amp; Next.</li>
+          <li>To change a saved answer, revisit and update it, then save again.</li>
+        </ul>
+      </div>
+      <div class="terms-section">
+        <h3>6. Additional Notes / अतिरिक्त निर्देश</h3>
+        <ul>
+          <li>Maintain silence and do not communicate with other candidates.</li>
+          <li>The system saves responses for each question and auto-submits when time ends.</li>
+          <li>If you have any queries regarding exam content, seek assistance from the invigilator.</li>
+          <li>In case of a technical issue (system hang, network loss, or power failure), immediately inform the invigilator.</li>
+          <li>Bathroom breaks or leaving your seat are not allowed during the exam.</li>
+          <li>All exam materials provided must be returned before exiting the examination hall.</li>
+          <li>Do not attempt to capture screenshots or take photos of the exam screen.</li>
+          <li>Use only the designated computer and do not switch systems during the exam.</li>
+          <li>Any attempt to use unfair means or malpractice will result in disqualification.</li>
+          <li>Remain seated until the invigilator announces the end of the exam.</li>
+          <li>Do not discuss or share any questions or answers with other candidates.</li>
+        </ul>
+        <p style="text-align:center;font-weight:700">Good Luck.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="intro-footer">
+    <button id="introBackBtn" class="hidden">Back</button>
+    <label class="ready-agreement hidden" id="readyAgreement">
+      <input type="checkbox" id="readyCheck">
+      <span>I have read and understood the instructions. All computer hardware allotted to me are in proper working condition. I declare that I am not in possession of / not wearing / not carrying any prohibited gadget or material. I agree that in case of not adhering to the instructions, I shall be liable to be debarred from this test and/or disciplinary action.</span>
+    </label>
+    <span style="flex:1"></span>
+    <button id="introNextBtn">Next</button>
+    <button id="readyBtn" class="hidden" disabled>I am ready to begin</button>
+  </div>
+</section>
+
+<header class="topline hidden" id="examHeader">
   <div class="zoom-actions">
     <button class="zoom" id="zoomIn" aria-label="Zoom in">(+)</button>
     <button class="zoom" id="zoomOut" aria-label="Zoom out">(−)</button>
@@ -128,14 +280,14 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
     <div class="timerbox"><div class="timerlabel">Time Left</div><div class="timer" id="timer">--:--</div></div>
   </div>
 </header>
-<nav class="utilitybar">
+<nav class="utilitybar hidden" id="examUtility">
   <button id="symbolsBtn">SYMBOLS</button>
   <button id="instructionsBtn">INSTRUCTIONS</button>
 </nav>
-<div class="sectionbar" id="sectionBar">
+<div class="sectionbar hidden" id="sectionBar">
   <button class="section-tab subject active" id="sectionName">LOADING SUBJECT</button>
 </div>
-<div class="controlbar">
+<div class="controlbar hidden" id="examControls">
   <button class="exam-btn" id="prevBtn">Previous</button>
   <button class="exam-btn" id="reviewBtn">Mark For Review</button>
   <button class="exam-btn" id="nextBtn">Save &amp; Next</button>
@@ -143,12 +295,12 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
   <button class="exam-btn" id="submitSectionBtn">Submit Section</button>
   <button class="exam-btn" id="submitBtn">Submit Test</button>
 </div>
-<div class="summary-line">
+<div class="summary-line hidden" id="examSummary">
   <span class="marking" id="markingMeta">Marks for correct answer: — | Negative: —</span>
   <span class="answered-line">Total Questions Answered: <strong id="answeredCount">0</strong></span>
 </div>
 
-<main id="testArea">
+<main id="testArea" class="hidden">
   <div class="exam-layout">
     <section class="question-area">
       <div class="question-head">
@@ -177,15 +329,15 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
     </aside>
   </div>
 </main>
-<button class="drawer-toggle" id="drawerToggle" aria-label="Open question palette">◀</button>
+<button class="drawer-toggle hidden" id="drawerToggle" aria-label="Open question palette">◀</button>
 <div class="overlay" id="overlay"></div>
 <section class="result hidden" id="resultArea"></section>
-<footer>© <span id="year"></span> RankersBoard. Practice. Improve. Succeed.</footer>
+<footer class="hidden" id="examFooter">© <span id="year"></span> RankersBoard. Practice. Improve. Succeed.</footer>
 
 <script type="module">
 "use strict";
 import { supabase } from "./supabase-client.js";
-let questions=[],testConfig=null,timerInterval=null,paused=false,questionFont=30;
+let questions=[],testConfig=null,timerInterval=null,paused=false,questionFont=30,introStage=1;
 const state={current:0,answers:[],review:[],saved:[],seconds:0,finished:false};
 const $=id=>document.getElementById(id);
 const testArea=$("testArea"),resultArea=$("resultArea");
@@ -293,8 +445,60 @@ document.addEventListener("fullscreenchange",()=>{
 });
 $("zoomIn").addEventListener("click",()=>{questionFont=Math.min(48,questionFont+2);$("questionText").style.fontSize=questionFont+"px";});
 $("zoomOut").addEventListener("click",()=>{questionFont=Math.max(16,questionFont-2);$("questionText").style.fontSize=questionFont+"px";});
-$("symbolsBtn").addEventListener("click",()=>alert("Symbols:  α  β  γ  θ  π  √  ∑  ±  ×  ÷"));
-$("instructionsBtn").addEventListener("click",()=>alert("Instructions:\n1. Select one option for each question.\n2. Use Save & Next to move forward.\n3. Mark For Review to revisit a question.\n4. Use the question palette to navigate.\n5. Submit Test when you are ready."));
+$("symbolsBtn").addEventListener("click",()=>alert("Blue: Not attempted. Green: Answered. Red/yellow: Marked for review. Save & Next: Save and move forward. Previous: Go back."));
+$("instructionsBtn").addEventListener("click",()=>alert("Read the instructions before starting. Your test auto-submits when the timer reaches zero. Use Save & Next to save an answer."));
+
+function showIntro(){
+ $("introScreen").classList.remove("hidden");
+ $("introMarks").innerHTML=`Right answer : ${Number(testConfig.marks_per_correct)} marks<br>Wrong Answer: -${Number(testConfig.negative_marks)} marks<br>Not attempted: 0 marks`;
+ $("termsDuration").textContent=testConfig.duration_minutes;
+ $("termsDurationHindi").textContent=testConfig.duration_minutes;
+ $("termsQuestions").textContent=questions.length;
+ $("termsNegative").textContent=Number(testConfig.negative_marks);
+ $("termsSubject").textContent=subjectName();
+ $("termsQuestionCount").textContent=questions.length;
+ $("termsMaxMarks").textContent=(questions.length*Number(testConfig.marks_per_correct)).toFixed(2);
+ $("introNextBtn").classList.remove("hidden");
+ $("introBackBtn").classList.add("hidden");
+ $("readyAgreement").classList.add("hidden");
+ $("readyBtn").classList.add("hidden");
+ $("termsIntro").classList.remove("hidden");
+ $("symbolsIntro").classList.add("hidden");
+ $("readyCheck").checked=false;
+ $("readyBtn").disabled=true;
+ introStage=1;
+}
+$("introNextBtn").addEventListener("click",()=>{
+ $("termsIntro").classList.add("hidden");
+ $("symbolsIntro").classList.remove("hidden");
+ $("introNextBtn").classList.add("hidden");
+ $("introBackBtn").classList.remove("hidden");
+ $("readyAgreement").classList.remove("hidden");
+ $("readyBtn").classList.remove("hidden");
+ $("readyCheck").checked=false;
+ $("readyBtn").disabled=true;
+ introStage=2;
+});
+$("introBackBtn").addEventListener("click",()=>{
+ $("symbolsIntro").classList.add("hidden");
+ $("termsIntro").classList.remove("hidden");
+ $("introNextBtn").classList.remove("hidden");
+ $("introBackBtn").classList.add("hidden");
+ $("readyAgreement").classList.add("hidden");
+ $("readyBtn").classList.add("hidden");
+ introStage=1;
+});
+$("readyCheck").addEventListener("change",e=>{$("readyBtn").disabled=!e.target.checked;});
+$("readyBtn").addEventListener("click",()=>{
+ if(!$("readyCheck").checked)return;
+ $("introScreen").classList.add("hidden");
+ ["examHeader","examUtility","sectionBar","examControls","examSummary","testArea","examFooter","drawerToggle"].forEach(id=>$(id).classList.remove("hidden"));
+ state.seconds=Number(testConfig.duration_minutes)*60;
+ updateTimer();
+ timerInterval=setInterval(()=>{if(state.finished||paused)return;state.seconds=Math.max(0,state.seconds-1);updateTimer();if(state.seconds<=0)finishTest(true);},1000);
+ window.scrollTo({top:0,behavior:"instant"});
+});
+
 $("year").textContent=new Date().getFullYear();
 async function initialise(){
  try{
@@ -322,7 +526,7 @@ async function initialise(){
   $("analysisHeading").textContent=(test.section||test.subject||"General Awareness")+" Analysis";
   $("markingMeta").textContent=`Marks for correct answer: ${Number(test.marks_per_correct).toFixed(2)} | Negative: ${Number(test.negative_marks).toFixed(2)}`;
   renderQuestion();updateTimer();
-  timerInterval=setInterval(()=>{if(state.finished||paused)return;state.seconds=Math.max(0,state.seconds-1);updateTimer();if(state.seconds<=0)finishTest(true);},1000);
+  showIntro();
  }catch(e){
   $("questionText").textContent="Unable to load this test: "+(e.message||"Please try again.");
   $("options").replaceChildren();
