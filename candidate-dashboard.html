@@ -7,153 +7,36 @@
   <title>Candidate Dashboard | RankersBoard</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f6fc;
-      color: #17213a;
-    }
-
-    header {
-      background: #101b35;
-      color: white;
-      padding: 18px 6%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .logo {
-      color: white;
-      text-decoration: none;
-      font-size: 23px;
-      font-weight: bold;
-    }
-
-    .logo span {
-      color: #8eacff;
-    }
-
-    .home-link {
-      color: white;
-      text-decoration: none;
-    }
-
-    .container {
-      max-width: 1000px;
-      width: 92%;
-      margin: 35px auto;
-    }
-
-    .welcome {
-      margin-bottom: 25px;
-    }
-
-    .welcome h1 {
-      font-size: 30px;
-      margin-bottom: 8px;
-    }
-
-    .welcome p {
-      color: #64708a;
-      line-height: 1.6;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(
-        auto-fit, minmax(230px, 1fr)
-      );
-      gap: 20px;
-    }
-
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 14px;
-      border: 1px solid #e1e7f2;
-      box-shadow: 0 5px 18px rgba(16, 27, 53, 0.05);
-    }
-
-    .icon {
-      font-size: 32px;
-      margin-bottom: 12px;
-    }
-
-    .card h2 {
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
-
-    .card p {
-      color: #64708a;
-      line-height: 1.6;
-      font-size: 14px;
-      min-height: 45px;
-    }
-
-    .btn {
-      display: inline-block;
-      background: #315efb;
-      color: white;
-      padding: 11px 15px;
-      border: none;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-
-    .btn:hover {
-      background: #244bd1;
-    }
-
-    .logout-btn {
-      background: #dc3545;
-    }
-
-    .logout-btn:hover {
-      background: #b92534;
-    }
-
-    .message {
-      margin-top: 22px;
-      padding: 14px;
-      background: #e8efff;
-      color: #263f85;
-      border-radius: 9px;
-      line-height: 1.6;
-    }
-
-    .message.error {
-      background: #fff0f0;
-      color: #a52222;
-    }
-
-    footer {
-      text-align: center;
-      padding: 25px;
-      color: #748098;
-      font-size: 13px;
-    }
-
-    @media (max-width: 500px) {
-      .welcome h1 {
-        font-size: 25px;
-      }
-
-      .card {
-        padding: 20px;
-      }
-    }
+    :root { color-scheme: light; --ink:#111111; --muted:#777777; --line:#e7e7e7; --paper:#fafafa; --white:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--paper); color:var(--ink); }
+    header { background:#fff; color:var(--ink); padding:20px max(5%, calc((100% - 1120px)/2)); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--line); }
+    .logo { color:#111; text-decoration:none; font-size:22px; letter-spacing:-.8px; font-weight:800; }
+    .logo span { color:#777; }
+    .home-link { color:#222; text-decoration:none; font-size:14px; font-weight:650; padding:10px 15px; border:1px solid #d8d8d8; border-radius:999px; transition:background .2s ease, transform .2s ease; }
+    .home-link:hover { background:#f0f0f0; transform:translateY(-1px); }
+    .container { max-width:1120px; width:90%; margin:52px auto; }
+    .welcome { margin-bottom:30px; animation:rise .55s ease both; }
+    .welcome h1 { font-size:clamp(28px,4vw,40px); letter-spacing:-1.5px; margin:0 0 9px; font-weight:800; }
+    .welcome p { color:var(--muted); line-height:1.65; margin:0; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(235px,1fr)); gap:18px; }
+    .card { background:#fff; padding:27px; border-radius:18px; border:1px solid var(--line); box-shadow:0 8px 28px rgba(0,0,0,.035); transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease; animation:rise .6s ease both; }
+    .card:nth-child(2){animation-delay:.06s}.card:nth-child(3){animation-delay:.12s}.card:nth-child(4){animation-delay:.18s}
+    .card:hover { transform:translateY(-4px); box-shadow:0 14px 34px rgba(0,0,0,.075); border-color:#cfcfcf; }
+    .icon { font-size:29px; margin-bottom:16px; filter:grayscale(1); }
+    .card h2 { margin:0 0 10px; font-size:19px; letter-spacing:-.35px; }
+    .card p { color:#737373; line-height:1.65; font-size:14px; min-height:46px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; background:#111; color:#fff; padding:11px 16px; border:1px solid #111; border-radius:999px; text-decoration:none; font-size:13px; font-weight:700; cursor:pointer; margin-top:9px; transition:background .2s ease, color .2s ease, transform .2s ease; }
+    .btn:hover { background:#fff; color:#111; transform:translateY(-1px); }
+    .btn:disabled { opacity:.55; cursor:wait; transform:none; }
+    .logout-btn { background:#fff; color:#111; border-color:#bdbdbd; }
+    .logout-btn:hover { background:#111; color:#fff; border-color:#111; }
+    .message { margin-top:24px; padding:16px 18px; background:#f0f0f0; color:#333; border:1px solid #e4e4e4; border-radius:12px; line-height:1.6; }
+    .message.error { background:#f5f5f5; color:#222; border-color:#cfcfcf; }
+    footer { text-align:center; padding:28px 18px; color:#888; font-size:12px; border-top:1px solid var(--line); }
+    @keyframes rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+    @media (max-width:500px) { .container{margin:34px auto}.welcome h1{font-size:27px}.card{padding:22px}header{padding:16px 5%} }
   </style>
 </head>
 
@@ -291,7 +174,6 @@
 
     loadDashboard();
   </script>
-<div style="text-align:center;font-size:10px;line-height:1.4;color:#8b8b8b;opacity:.78;padding:8px 12px 14px;letter-spacing:.2px;">Powered by Dark Vision by Sachit</div>
 </body>
 </html>
 ```

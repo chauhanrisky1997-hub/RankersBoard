@@ -1,0 +1,1 @@
+RankersBoard monochrome page updates. Replace matching files in your GitHub repository one at a time. Do NOT replace mock-test.html or supabase-client.js. The main homepage index.html is the separately supplied homepage file. These files preserve the original page markup and JavaScript and add a monochrome visual override. Test each page after committing.

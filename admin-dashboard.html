@@ -2,7 +2,24 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Dashboard | RankersBoard</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f3f6fc;color:#17213a;font-family:Arial,sans-serif}header{background:#101b35;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}header a{color:white}main{max-width:1100px;margin:30px auto;padding:0 18px}.panel{background:white;border:1px solid #e1e7f2;border-radius:14px;padding:22px;margin-bottom:20px}h1{margin:0 0 6px}h2{margin:0 0 16px;font-size:20px}.muted{color:#657087;font-size:14px;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}input,select,textarea{width:100%;padding:11px;border:1px solid #cfd7e6;border-radius:8px;font:inherit}textarea{min-height:75px}button,.btn{border:0;border-radius:8px;padding:11px 15px;background:#315efb;color:white;font-weight:700;cursor:pointer;margin-top:12px}button.secondary{background:#e8edfa;color:#17213a}button.danger{background:#b42318}button:disabled{opacity:.6}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.test{border:1px solid #e1e7f2;border-radius:10px;padding:14px;margin-top:10px}.status{font-size:12px;font-weight:bold;color:#52617a}.msg{margin-top:10px;font-size:14px;color:#167647}.hidden{display:none}small{color:#657087}.credit{text-align:center;color:#9299a8;font-size:10px;padding:20px}
-</style></head><body><header><strong>RankersBoard · Admin</strong><div class="row" style="flex:0 1 auto"><a href="index.html">View site</a><button id="logout" class="secondary">Logout</button></div></header>
+</style>
+<style id="rankersboard-monochrome-theme">
+:root{color-scheme:light;--rb-black:#111111;--rb-ink:#171717;--rb-muted:#6b6b6b;--rb-paper:#ffffff;--rb-soft:#f5f5f3;--rb-line:#e5e5e2;--rb-shadow:0 12px 32px rgba(0,0,0,.07)}
+html,body{background:var(--rb-paper)!important;color:var(--rb-ink)!important}
+body{font-family:Inter,Arial,Helvetica,sans-serif!important}
+a{color:var(--rb-ink)!important}
+header,nav,.navbar,.topbar,.sidebar,.site-header{background:#fff!important;color:#111!important;border-color:var(--rb-line)!important;box-shadow:0 4px 20px rgba(0,0,0,.035)}
+button,.btn,.button,input[type=submit],input[type=button],a.btn,a.button{background:#111!important;background-image:none!important;color:#fff!important;border:1px solid #111!important;border-radius:999px!important;box-shadow:none!important}
+button:hover,.btn:hover,.button:hover,input[type=submit]:hover,input[type=button]:hover,a.btn:hover,a.button:hover{background:#333!important;color:#fff!important}
+button.secondary,.btn-secondary,.secondary-button,a.secondary{background:#fff!important;color:#111!important;border:1px solid #cfcfcb!important}
+.card,.panel,.tile,.stat-card,.course-card,.test-card,.content-card,.modal-content{background:#fff!important;color:#171717!important;border:1px solid var(--rb-line)!important;border-radius:18px!important;box-shadow:var(--rb-shadow)!important}
+input,select,textarea{background:#fff!important;color:#171717!important;border:1px solid #d8d8d4!important;border-radius:10px!important}
+.badge,.tag,.pill{background:#f1f1ef!important;color:#222!important;border:1px solid #e1e1dd!important}
+footer{background:#111!important;color:#fff!important}
+[style*="#315efb"],[style*="#2563eb"],[style*="#3b82f6"],[style*="blue"],[style*="#1e40af"],[style*="#101b35"]{ }
+</style>
+
+</head><body><header><strong>RankersBoard · Admin</strong><div class="row" style="flex:0 1 auto"><a href="index.html">View site</a><button id="logout" class="secondary">Logout</button></div></header>
 <main><h1>Test management</h1><p class="muted">Create test categories, add questions and publish tests for your platform.</p>
 <section class="panel"><h2>1. Add exam category</h2><div class="row"><input id="categoryName" placeholder="e.g. SSC CGL, Banking, Railway"><button id="addCategory">Add category</button></div><div id="catMsg" class="msg"></div></section>
 <section class="panel"><h2>2. Create a test</h2><div class="grid">
