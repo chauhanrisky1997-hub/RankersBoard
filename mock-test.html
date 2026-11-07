@@ -44,9 +44,9 @@ button:focus-visible,select:focus-visible{outline:3px solid #91b3ff;outline-offs
 .tool-spacer{flex:1}
 .small-action{border:0;color:#fff;padding:11px 14px;font-size:17px;background:#20b85b}
 .small-action.report{background:#d63245;border-radius:12px 12px 12px 0}
-.question-content{padding:26px 36px 32px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(22px,2.1vw,31px);line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.question-content{padding:22px 28px 24px;font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
 .option-list{padding:0 22px 28px;display:grid;gap:0}
-.option-row{display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid #e1e1e1;padding:12px 8px;font-size:20px;line-height:1.45;cursor:pointer}
+.option-row{display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid #e1e1e1;padding:9px 8px;font-size:16px;line-height:1.4;cursor:pointer}
 .option-row input{width:19px;height:19px;margin-top:5px;accent-color:var(--blue);flex-shrink:0}
 .palette-panel{border:1px solid #d8dce2;border-left:0;min-width:0;background:#fff}
 .palette-head{padding:16px 14px;font-size:22px;font-weight:600}
@@ -91,7 +91,7 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
  .exam-layout{display:block;padding:0 20px 24px}
  .question-area{min-height:500px}
  .question-head{font-size:22px;padding:12px 20px}
- .question-content{padding:24px 22px;font-size:clamp(21px,4.3vw,28px);line-height:1.65}
+ .question-content{padding:20px 18px;font-size:18px;line-height:1.55}
  .option-row{font-size:20px}
  .palette-panel{display:none;position:fixed;z-index:50;top:28%;right:0;bottom:0;width:min(82vw,430px);overflow:auto;border:1px solid #ccc;box-shadow:0 0 0 999px #0003}
  .palette-panel.open{display:block}
@@ -160,6 +160,9 @@ footer{text-align:center;color:#888;font-size:11px;padding:15px}
  .terms-table{width:100%;font-size:10px}
 }
 
+.question-image{display:block;max-width:min(100%,760px);max-height:520px;width:auto;height:auto;object-fit:contain;margin:8px 0 18px;border:0}
+.option-image{display:block;max-width:min(100%,420px);max-height:260px;width:auto;height:auto;object-fit:contain;margin:5px 0}
+@media(max-width:800px){.question-image{max-width:100%;max-height:420px}.option-image{max-width:100%;max-height:220px}}
 </style>
 </head>
 <body>
@@ -369,15 +372,18 @@ function renderQuestion(){
  const q=questions[state.current];
  $("questionNumber").textContent=`Question: ${state.current+1}`;
  $("lastTime").textContent=`Last ${Math.ceil(state.seconds/60)} Minutes`;
- $("questionText").textContent=q.text;
- $("questionText").style.fontSize=questionFont+"px";
+ const questionText=$("questionText");questionText.replaceChildren();
+ const qText=document.createElement("div");qText.textContent=q.text||"";qText.style.fontSize=questionFont+"px";questionText.appendChild(qText);
+ if(q.imageUrl){const image=document.createElement("img");image.className="question-image";image.src=q.imageUrl;image.alt="Question illustration";image.loading="lazy";questionText.appendChild(image);}
  const options=$("options");options.replaceChildren();
  q.options.forEach((value,index)=>{
   const label=document.createElement("label");label.className="option-row";
   const input=document.createElement("input");input.type="radio";input.name="answer";input.checked=state.answers[state.current]===index;
   input.addEventListener("change",()=>{state.answers[state.current]=index;renderQuestion();});
-  const text=document.createElement("span");text.textContent=value;
-  label.append(input,text);options.appendChild(label);
+  const text=document.createElement("span");text.textContent=value||"";label.append(input,text);
+  const optionImageUrl=q.optionImageUrls?.[index];
+  if(optionImageUrl){const image=document.createElement("img");image.className="option-image";image.src=optionImageUrl;image.alt=`Option ${String.fromCharCode(65+index)} illustration`;image.loading="lazy";label.appendChild(image);}
+  options.appendChild(label);
  });
  $("prevBtn").disabled=state.current===0;
  $("nextBtn").textContent=state.current===questions.length-1?"Save & Next":"Save & Next";
@@ -511,12 +517,12 @@ async function initialise(){
    .eq("id",testId).eq("status","published").single();
   if(testError||!test)throw new Error(testError?.message||"This test is unavailable or not published.");
   const {data:rows,error:questionError}=await supabase.from("rb_questions")
-   .select("id,question_text,option_a,option_b,option_c,option_d,correct_option,explanation,position")
+   .select("id,question_text,option_a,option_b,option_c,option_d,correct_option,explanation,position,question_image_url,option_a_image_url,option_b_image_url,option_c_image_url,option_d_image_url")
    .eq("test_id",testId).order("position",{ascending:true}).order("id",{ascending:true});
   if(questionError)throw questionError;
   if(!rows?.length)throw new Error("No questions have been added to this test.");
   testConfig=test;
-  questions=rows.map(r=>({text:r.question_text,options:[r.option_a,r.option_b,r.option_c,r.option_d],answer:["A","B","C","D"].indexOf(String(r.correct_option).toUpperCase()),explanation:r.explanation||""}));
+  questions=rows.map(r=>({text:r.question_text,options:[r.option_a,r.option_b,r.option_c,r.option_d],imageUrl:r.question_image_url||"",optionImageUrls:[r.option_a_image_url||"",r.option_b_image_url||"",r.option_c_image_url||"",r.option_d_image_url||""],answer:["A","B","C","D"].indexOf(String(r.correct_option).toUpperCase()),explanation:r.explanation||""}));
   if(questions.some(q=>q.answer<0))throw new Error("A question has an invalid correct option.");
   state.answers=Array(questions.length).fill(null);state.review=Array(questions.length).fill(false);state.saved=Array(questions.length).fill(false);
   state.seconds=Number(test.duration_minutes)*60;
