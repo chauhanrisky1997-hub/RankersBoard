@@ -26,7 +26,7 @@ footer{background:#111!important;color:#fff!important}
 <div><label>Exam category</label><select id="category"></select></div><div><label>Test title</label><input id="title" placeholder="e.g. SSC CGL Quant Mock 01"></div><div><label>Subject</label><input id="subject" placeholder="e.g. Quantitative Aptitude"></div><div><label>Section (optional)</label><input id="section" placeholder="e.g. Algebra"></div><div><label>Duration (minutes)</label><input id="duration" type="number" min="1" value="30"></div><div><label>Marks per correct answer</label><input id="positive" type="number" step="0.25" value="1"></div><div><label>Negative marks</label><input id="negative" type="number" step="0.25" value="0"></div></div><button id="createTest">Create draft test</button><div id="testMsg" class="msg"></div></section>
 <section class="panel"><h2>3. Add questions to a test</h2><label>Select test</label><select id="testSelect"></select><div class="grid"><div><label>Question</label><textarea id="qtext" placeholder="Enter question text"></textarea></div><div><label>Explanation (optional)</label><textarea id="explanation" placeholder="Explain the correct answer"></textarea></div></div><div class="grid">
 <div><label>Option A</label><input id="a"></div><div><label>Option B</label><input id="b"></div><div><label>Option C</label><input id="c"></div><div><label>Option D</label><input id="d"></div></div><div class="row"><div><label>Correct option</label><select id="correct"><option>A</option><option>B</option><option>C</option><option>D</option></select></div><div><label>Question number</label><input id="position" type="number" min="1" value="1"></div></div><button id="addQuestion">Save question</button><div id="questionMsg" class="msg"></div>
-<hr style="border:0;border-top:1px solid #e5eaf2;margin:22px 0"><h3>Bulk upload questions (CSV)</h3><p class="muted">CSV columns must be: question, option_a, option_b, option_c, option_d, correct_option, explanation. Use A/B/C/D for the correct option.</p><input type="file" id="csvFile" accept=".csv,text/csv"><button id="uploadCsv" class="secondary">Import CSV into selected test</button><div id="csvMsg" class="msg"></div><p><a href="rankersboard-question-template.csv" download>Download CSV template</a></p></section>
+<hr style="border:0;border-top:1px solid #e5eaf2;margin:22px 0"><h3>Bulk upload questions (CSV)</h3><p class="muted">CSV columns: question, option_a, option_b, option_c, option_d, correct_option, explanation. An extra index column is allowed. Use A/B/C/D for the correct option.</p><input type="file" id="csvFile" accept=".csv,text/csv"><button id="uploadCsv" class="secondary">Import CSV into selected test</button><div id="csvMsg" class="msg"></div><p><a href="rankersboard-question-template.csv" download>Download CSV template</a></p></section>
 <section class="panel"><h2>4. Existing tests</h2><div id="testsList" class="muted">Loading…</div></section>
 <div class="credit">Powered by Dark Vision by Sachit</div></main>
 <script type="module">
@@ -39,8 +39,55 @@ $("addCategory").onclick=async()=>{const name=$("categoryName").value.trim();if(
 $("createTest").onclick=async()=>{const payload={category_id:$("category").value||null,title:$("title").value.trim(),subject:$("subject").value.trim(),section:$("section").value.trim()||null,duration_minutes:Number($("duration").value),marks_per_correct:Number($("positive").value),negative_marks:Number($("negative").value)};if(!payload.title||!payload.subject){$("testMsg").textContent="Enter test title and subject.";return;}const {data,error}=await supabase.from("rb_tests").insert(payload).select().single();$("testMsg").textContent=error?error.message:"Draft test created.";if(!error){$("title").value="";await load();$("testSelect").value=data.id;}};
 $("addQuestion").onclick=async()=>{const test_id=$("testSelect").value;const p={test_id,question_text:$("qtext").value.trim(),option_a:$("a").value.trim(),option_b:$("b").value.trim(),option_c:$("c").value.trim(),option_d:$("d").value.trim(),correct_option:$("correct").value,explanation:$("explanation").value.trim()||null,position:Number($("position").value)||1};if(!test_id||!p.question_text||!p.option_a||!p.option_b||!p.option_c||!p.option_d){$("questionMsg").textContent="Select a test and fill the question and all four options.";return;}const {error}=await supabase.from("rb_questions").insert(p);$("questionMsg").textContent=error?error.message:"Question saved.";if(!error){["qtext","a","b","c","d","explanation"].forEach(id=>$(id).value="");$("position").value=Number($("position").value)+1;}};
 async function togglePublish(id){const t=tests.find(x=>String(x.id)===String(id));const {error}=await supabase.from("rb_tests").update({status:t.status==="published"?"draft":"published",updated_at:new Date().toISOString()}).eq("id",id);if(error)alert(error.message);else await load();}
-function parseCSV(text){const rows=[];let row=[],v="",q=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'&&q&&text[i+1]==='"'){v+='"';i++;}else if(c==='"'){q=!q;}else if(c===","&&!q){row.push(v);v="";}else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&text[i+1]==="\n")i++;row.push(v);if(row.some(x=>x.trim()))rows.push(row);row=[];v="";}else v+=c;}row.push(v);if(row.some(x=>x.trim()))rows.push(row);return rows;}
-$("uploadCsv").onclick=async()=>{const f=$("csvFile").files[0],test_id=$("testSelect").value;if(!f||!test_id){$("csvMsg").textContent="Choose a CSV file and a test.";return;}const rows=parseCSV(await f.text());const headers=rows.shift().map(x=>x.trim().toLowerCase());const required=["question","option_a","option_b","option_c","option_d","correct_option"];const indexes=Object.fromEntries(required.map(k=>[k,headers.indexOf(k)]));if(required.some(k=>indexes[k]<0)){ $("csvMsg").textContent="CSV headers are missing. Download and use the template.";return;}const ex=headers.indexOf("explanation");const payload=rows.map((r,i)=>({test_id,question_text:r[indexes.question]?.trim(),option_a:r[indexes.option_a]?.trim(),option_b:r[indexes.option_b]?.trim(),option_c:r[indexes.option_c]?.trim(),option_d:r[indexes.option_d]?.trim(),correct_option:r[indexes.correct_option]?.trim().toUpperCase(),explanation:ex>=0?(r[ex]?.trim()||null):null,position:i+1}));if(payload.some(p=>!p.question_text||!p.option_a||!p.option_b||!p.option_c||!p.option_d||!["A","B","C","D"].includes(p.correct_option))){$("csvMsg").textContent="CSV has empty fields or invalid correct_option. Correct values must be A/B/C/D.";return;}const {error}=await supabase.from("rb_questions").insert(payload);$("csvMsg").textContent=error?error.message:`Imported ${payload.length} questions.`;};
+function parseCSV(text){
+  text=text.replace(/^\uFEFF/,"");
+  const rows=[];let row=[],v="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(c==='"'&&q&&text[i+1]==='"'){v+='"';i++;}
+    else if(c==='"'){q=!q;}
+    else if(c===','&&!q){row.push(v);v="";}
+    else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&text[i+1]==='\n')i++;row.push(v);if(row.some(x=>x.trim()))rows.push(row);row=[];v="";}
+    else v+=c;
+  }
+  row.push(v);if(row.some(x=>x.trim()))rows.push(row);return rows;
+}
+$("uploadCsv").onclick=async()=>{
+  const button=$("uploadCsv"),msg=$("csvMsg"),f=$("csvFile").files[0],test_id=$("testSelect").value;
+  if(!f||!test_id){msg.textContent="Choose a CSV file and a test.";return;}
+  button.disabled=true;msg.textContent="Reading and validating CSV…";
+  try{
+    const rows=parseCSV(await f.text());
+    if(rows.length<2)throw new Error("CSV has a header row but no question rows.");
+    const headers=rows.shift().map(x=>x.trim().toLowerCase().replace(/^\uFEFF/,""));
+    const aliases={question:["question","question_text","questiontext"],option_a:["option_a","option a","a"],option_b:["option_b","option b","b"],option_c:["option_c","option c","c"],option_d:["option_d","option d","d"],correct_option:["correct_option","correct option","answer","correct_answer","correct answer"],explanation:["explanation","solution"]};
+    const col={};for(const [key,names] of Object.entries(aliases))col[key]=headers.findIndex(h=>names.includes(h));
+    const required=["question","option_a","option_b","option_c","option_d","correct_option"];
+    const missing=required.filter(k=>col[k]<0);
+    if(missing.length)throw new Error("Missing CSV columns: "+missing.join(", ")+". Found: "+headers.join(", "));
+    const payload=[];const errors=[];
+    rows.forEach((r,i)=>{
+      const get=k=>col[k]>=0?String(r[col[k]]??"").trim():"";
+      const answer=get("correct_option").toUpperCase().replace(/^OPTION\s*/,"");
+      const item={test_id,question_text:get("question"),option_a:get("option_a"),option_b:get("option_b"),option_c:get("option_c"),option_d:get("option_d"),correct_option:answer,explanation:get("explanation")||null,position:payload.length+1};
+      const missingFields=["question_text","option_a","option_b","option_c","option_d"].filter(k=>!item[k]);
+      if(missingFields.length||!['A','B','C','D'].includes(answer)){if(errors.length<8)errors.push("Row "+(i+2)+": "+(missingFields.length?"empty "+missingFields.join("/"):"correct_option must be A, B, C or D"));}
+      else payload.push(item);
+    });
+    if(errors.length)throw new Error("CSV validation failed. "+errors.join("; "));
+    if(!payload.length)throw new Error("No valid question rows found.");
+    msg.textContent="Importing "+payload.length+" questions…";
+    let imported=0;
+    for(let i=0;i<payload.length;i+=100){
+      const batch=payload.slice(i,i+100);
+      const {error}=await supabase.from("rb_questions").insert(batch);
+      if(error)throw new Error("Imported "+imported+" of "+payload.length+" questions. Supabase error: "+error.message+". Fix the issue before retrying to avoid duplicate rows.");
+      imported+=batch.length;msg.textContent="Imported "+imported+" / "+payload.length+" questions…";
+    }
+    msg.textContent="Success! Imported "+imported+" questions into the selected test. The 'index' column, if present, was ignored.";
+    $("csvFile").value="";
+  }catch(e){msg.textContent=e.message||String(e);}
+  finally{button.disabled=false;}
+};
 $("logout").onclick=async()=>{await supabase.auth.signOut();location.href="admin.html";};
 if(await ensureAdmin()){try{await load();}catch(e){$("testsList").textContent=e.message;}}
 </script></body></html>
