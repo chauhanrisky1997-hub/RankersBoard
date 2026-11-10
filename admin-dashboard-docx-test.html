@@ -167,13 +167,17 @@ $("parseDocx").onclick=async()=>{
  const file=$("docxFile").files[0];if(!file){$("docxMsg").textContent="Choose a DOCX file first.";return;}
  const btn=$("parseDocx");btn.disabled=true;$("docxMsg").textContent="Reading Word document and extracting embedded images…";
  try{
-  const {default:mammoth}=await import("https://cdn.jsdelivr.net/npm/mammoth@1.9.0/+esm");
+  const mammothModule=await import("https://cdn.jsdelivr.net/npm/mammoth@1.9.0/+esm");
+  const mammoth=mammothModule.default||mammothModule;
+  if(!mammoth || typeof mammoth.convertToHtml!=="function") throw new Error("DOCX parser library did not load correctly. Refresh the page and try again.");
   const arrayBuffer=await file.arrayBuffer();
-  const result=await mammoth.convertToHtml({arrayBuffer},{convertImage:mammoth.images.imgElement(async image=>({src:`data:${image.contentType};base64,${await image.read("base64")}`}))});
+  // Let Mammoth use its built-in data-URI image converter. This avoids passing
+  // incomplete image metadata through a custom converter in some DOCX files.
+  const result=await mammoth.convertToHtml({arrayBuffer});
   parsedDocxQuestions=parseDocxHtml(result.value).map(q=>({...q,images:q.images.map(x=>({...x,preview:URL.createObjectURL(x.blob)})),optionImages:Object.fromEntries(Object.entries(q.optionImages).map(([k,a])=>[k,a.map(x=>({...x,preview:URL.createObjectURL(x.blob)}))]))}));
   if(!parsedDocxQuestions.length)throw new Error("No questions could be detected. This DOCX may use an unusual layout; please check the file or use the manual CSV workflow for now.");
   renderDocxPreview();$("docxMsg").textContent=`Extracted ${parsedDocxQuestions.length} possible questions. ${result.messages?.length||0} document formatting notices. Review numbering, tables, options and answers before importing.`;
- }catch(e){$("docxMsg").textContent="Could not parse DOCX: "+(e.message||e);}
+ }catch(e){console.error("RankersBoard DOCX extraction error",e);$("docxMsg").textContent="Could not parse DOCX: "+(e.message||e)+". If it happens again, send the browser console error.";}
  finally{btn.disabled=false;}
 };
 $("addParsedQuestion").onclick=()=>{parsedDocxQuestions.push({number:parsedDocxQuestions.length+1,question:"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""});renderDocxPreview();};
