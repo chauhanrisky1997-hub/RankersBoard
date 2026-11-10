@@ -167,23 +167,64 @@ $("parseDocx").onclick=async()=>{
  const file=$("docxFile").files[0];if(!file){$("docxMsg").textContent="Choose a DOCX file first.";return;}
  const btn=$("parseDocx");btn.disabled=true;$("docxMsg").textContent="Reading Word document and extracting embedded images…";
  try{
-  const mammothModule=await import("https://cdn.jsdelivr.net/npm/mammoth@1.9.0/+esm");
-  const mammoth=mammothModule.default||mammothModule;
-  if(!mammoth || typeof mammoth.convertToHtml!=="function") throw new Error("DOCX parser library did not load correctly. Refresh the page and try again.");
-  const arrayBuffer=await file.arrayBuffer();
-  // Bypass mammoth.images.imgElement: it assumes image.contentType exists
-  // and can throw when a DOCX image has missing content-type metadata.
-  // Read each image directly and provide a safe MIME fallback instead.
-  const convertImage = async image => {
-    const base64 = await image.read("base64");
-    const rawType = image && image.contentType ? String(image.contentType) : "image/png";
-    const contentType = /^image\/(png|jpeg|gif|bmp|webp|svg\+xml)$/i.test(rawType) ? rawType : "image/png";
-    return { src: `data:${contentType};base64,${base64}` };
-  };
-  const result=await mammoth.convertToHtml({arrayBuffer}, {convertImage});
-  parsedDocxQuestions=parseDocxHtml(result.value).map(q=>({...q,images:q.images.map(x=>({...x,preview:URL.createObjectURL(x.blob)})),optionImages:Object.fromEntries(Object.entries(q.optionImages).map(([k,a])=>[k,a.map(x=>({...x,preview:URL.createObjectURL(x.blob)}))]))}));
+  // Parse DOCX directly as OOXML ZIP. This deliberately avoids Mammoth entirely.
+  const JSZipModule=await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm");
+  const JSZip=JSZipModule.default||JSZipModule;
+  const zip=await JSZip.loadAsync(await file.arrayBuffer());
+  const docFile=zip.file("word/document.xml");
+  if(!docFile) throw new Error("This file does not contain word/document.xml. Please choose a valid .docx file.");
+  const xmlText=await docFile.async("text");
+  const xml=new DOMParser().parseFromString(xmlText,"application/xml");
+  if(xml.querySelector("parsererror")) throw new Error("The Word document XML is damaged or unreadable.");
+  const relFile=zip.file("word/_rels/document.xml.rels");
+  const relText=relFile?await relFile.async("text"):"<Relationships/>";
+  const relXml=new DOMParser().parseFromString(relText,"application/xml");
+  const rels={};
+  [...relXml.getElementsByTagName("Relationship")].forEach(r=>{rels[r.getAttribute("Id")]=r.getAttribute("Target")||"";});
+  const escHtml=v=>String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");
+  const mimeFor=path=>({png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",bmp:"image/bmp",tif:"image/tiff",tiff:"image/tiff",svg:"image/svg+xml",emf:"image/emf",wmf:"image/wmf"}[(path.split(".").pop()||"").toLowerCase()]||"application/octet-stream");
+  const imageCache={};
+  async function imageData(relId){
+    const target=rels[relId]; if(!target) return null;
+    let path=target.replace(/^\//,"");
+    if(!path.startsWith("word/")) path="word/"+path.replace(/^\.\//,"");
+    const entry=zip.file(path); if(!entry) return null;
+    if(imageCache[path]) return imageCache[path];
+    const blob=await entry.async("blob"); const type=mimeFor(path);
+    const safeBlob=type==="application/octet-stream"?new Blob([blob],{type:"image/png"}):new Blob([blob],{type});
+    const data={blob:safeBlob,type:type==="application/octet-stream"?"image/png":type,preview:URL.createObjectURL(safeBlob)};
+    imageCache[path]=data; return data;
+  }
+  const nsW="http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+  const nsA="http://schemas.openxmlformats.org/drawingml/2006/main";
+  const body=xml.getElementsByTagNameNS(nsW,"body")[0];
+  if(!body) throw new Error("No document body was found in this Word file.");
+  const htmlBlocks=[];
+  async function renderNode(node){
+    if(node.namespaceURI===nsW && node.localName==="p") {
+      let html="", plain="";
+      const walk=async n=>{
+        if(n.namespaceURI===nsW && (n.localName==="t"||n.localName==="delText")){const t=n.textContent||"";html+=escHtml(t);plain+=t;return;}
+        if(n.namespaceURI===nsW && n.localName==="tab"){html+=" ";plain+=" ";return;}
+        if(n.namespaceURI===nsW && n.localName==="br"){html+=" ";plain+=" ";return;}
+        if(n.namespaceURI===nsA && n.localName==="blip"){const id=n.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships","embed");const im=await imageData(id);if(im)html+=`<img src="data:${im.type};base64,${await blobBase64(im.blob)}">`;return;}
+        for(const c of [...n.children]) await walk(c);
+      };
+      await walk(node);
+      return `<p>${html}</p>`;
+    }
+    if(node.namespaceURI===nsW && node.localName==="tbl") {
+      let rows=""; for(const tr of [...node.children].filter(x=>x.localName==="tr")){let cells="";for(const tc of [...tr.children].filter(x=>x.localName==="tc")){let cell="";for(const child of [...tc.children]){const h=await renderNode(child);cell+=h.replace(/<\/?p>/g,"");}cells+=`<td>${cell}</td>`;}rows+=`<tr>${cells}</tr>`;}return `<table>${rows}</table>`;
+    }
+    return "";
+  }
+  async function blobBase64(blob){return await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(",")[1]||"");r.onerror=reject;r.readAsDataURL(blob);});}
+  for(const child of [...body.children]) {const h=await renderNode(child);if(h)htmlBlocks.push(h);}
+  const html=htmlBlocks.join("");
+  parsedDocxQuestions=parseDocxHtml(html);
+  parsedDocxQuestions=parsedDocxQuestions.map(q=>({...q,images:q.images.map(x=>({...x,preview:URL.createObjectURL(x.blob)})),optionImages:Object.fromEntries(Object.entries(q.optionImages).map(([k,a])=>[k,a.map(x=>({...x,preview:URL.createObjectURL(x.blob)}))]))}));
   if(!parsedDocxQuestions.length)throw new Error("No questions could be detected. This DOCX may use an unusual layout; please check the file or use the manual CSV workflow for now.");
-  renderDocxPreview();$("docxMsg").textContent=`Extracted ${parsedDocxQuestions.length} possible questions. ${result.messages?.length||0} document formatting notices. Review numbering, tables, options and answers before importing.`;
+  renderDocxPreview();$("docxMsg").textContent=`Extracted ${parsedDocxQuestions.length} possible questions. DOCX XML extraction completed. Review numbering, tables, options and answers before importing.`;
  }catch(e){console.error("RankersBoard DOCX extraction error",e);$("docxMsg").textContent="Could not parse DOCX: "+(e.message||e)+". If it happens again, send the browser console error.";}
  finally{btn.disabled=false;}
 };
