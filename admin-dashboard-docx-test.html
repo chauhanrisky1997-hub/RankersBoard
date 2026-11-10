@@ -119,59 +119,78 @@ $("uploadCsv").onclick=async()=>{
 let parsedDocxQuestions=[];
 const docxImageToData=src=>{const m=String(src||"").match(/^data:([^;]+);base64,(.+)$/);if(!m)return null;const raw=atob(m[2]),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return {blob:new Blob([bytes],{type:m[1]}),type:m[1]};};
 function cleanBlock(el){return (el.innerText||el.textContent||"").replace(/\u00a0/g," ").replace(/[\t ]+/g," ").trim();}
+function splitLanguages(value){
+ const text=String(value||"").replace(/\u00a0/g," ").trim();
+ if(!/[\u0900-\u097F]/.test(text)) return {en:text,hi:""};
+ // Separate Devanagari runs from Latin runs while retaining nearby words.
+ const parts=text.split(/([\u0900-\u097F][\u0900-\u097F\s\u0964\u0965,.;:!?()\[\]{}0-9०-९+\-=%\/]*|[^\u0900-\u097F]+)/g).filter(Boolean);
+ const hi=[],en=[];
+ for(const part of parts){if(/[\u0900-\u097F]/.test(part))hi.push(part.trim());else if(part.trim())en.push(part.trim());}
+ return {en:en.join(" ").replace(/\s+/g," ").trim(),hi:hi.join(" ").replace(/\s+/g," ").trim()};
+}
 function parseDocxHtml(html){
  const doc=new DOMParser().parseFromString(html,"text/html"), blocks=[...doc.body.children];
- const out=[];let cur=null;
+ const out=[];let cur=null,started=false;
  const qStart=/^(?:Q(?:uestion)?\s*)?(\d{1,3})\s*[).:-]\s*(.*)$/i;
- const ensure=()=>{if(!cur){cur={number:out.length+1,question:"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""};out.push(cur);}return cur;};
- const append=(field,value)=>{if(value)field[field===undefined?"question":"question"]=value;};
+ const likelyQuestion=t=>/^(?:if\b|what\b|which\b|who\b|when\b|where\b|why\b|how\b|find\b|calculate\b|simplify\b|evaluate\b|the following\b|a\s+\w+|an\s+\w+|\d+(?:[.)]|[.)]\s)|in the\b|refer to\b|based on\b)/i.test(t)||/\?\s*$/.test(t);
+ const makeQuestion=n=>({number:n||out.length+1,question:"",questionHi:"",options:{A:"",B:"",C:"",D:""},optionsHi:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:"",explanationHi:""});
+ const ensure=()=>{if(!cur){cur=makeQuestion(out.length+1);out.push(cur);}return cur;};
+ const append=(old,v)=>[old,v].filter(Boolean).join("\n");
  for(const el of blocks){
   let text=cleanBlock(el);
+  if(!text && !el.querySelector("img")) continue;
   if(/^END OF (?:SAMPLE )?PAPER\b/i.test(text)) continue;
   const qm=text.match(qStart);
-  if(qm){cur={number:Number(qm[1]),question:qm[2]||"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""};out.push(cur);text="";}
+  if(qm){started=true;cur=makeQuestion(Number(qm[1]));out.push(cur);text=qm[2]||"";}
+  else if(!started){
+   if(!likelyQuestion(text) && !el.querySelector("img")) continue;
+   started=true;
+  }
   const item=ensure();
-  // Keep tables readable as row/column text rather than flattening their cells together.
   if(el.tagName==="TABLE") text=[...el.querySelectorAll("tr")].map(tr=>[...tr.children].map(td=>cleanBlock(td)).join(" | ")).join("\n");
   if(text){
-   const ans=text.match(/^\s*(?:answer|correct answer)\s*[:.-]\s*([A-D])\b/i);
-   const exp=text.match(/^\s*(?:explanation|solution)\s*[:.-]\s*(.*)$/i);
+   const ans=text.match(/^\s*(?:answer|correct answer|उत्तर)\s*[:.-]\s*([A-D])\b/i);
+   const exp=text.match(/^\s*(?:explanation|solution|व्याख्या)\s*[:.-]\s*(.*)$/i);
    if(ans)item.answer=ans[1].toUpperCase();
-   else if(exp)item.explanation=exp[1]||"";
+   else if(exp){const langs=splitLanguages(exp[1]||"");if(langs.en)item.explanation=append(item.explanation,langs.en);if(langs.hi)item.explanationHi=append(item.explanationHi,langs.hi);}
    else {
-    // A Word paragraph can contain all four options on one line. Split each marker
-    // instead of accidentally placing the entire option string in Option A.
     const re=/(?:^|\s)(?:\(([A-D])\)|([A-D])[).])\s*/g;
     const marks=[...text.matchAll(re)];
     if(marks.length){
      const prefix=text.slice(0,marks[0].index).trim();
-     if(prefix)item.question=[item.question,prefix].filter(Boolean).join("\n");
+     if(prefix){const langs=splitLanguages(prefix);if(langs.en)item.question=append(item.question,langs.en);if(langs.hi)item.questionHi=append(item.questionHi,langs.hi);}
      for(let n=0;n<marks.length;n++){
       const key=(marks[n][1]||marks[n][2]).toUpperCase();
-      const begin=marks[n].index+marks[n][0].length;
-      const finish=n+1<marks.length?marks[n+1].index:text.length;
-      const value=text.slice(begin,finish).trim();
-      if(value)item.options[key]=[item.options[key],value].filter(Boolean).join(" ");
+      const begin=marks[n].index+marks[n][0].length,finish=n+1<marks.length?marks[n+1].index:text.length;
+      const langs=splitLanguages(text.slice(begin,finish).trim());
+      if(langs.en)item.options[key]=append(item.options[key],langs.en);
+      if(langs.hi)item.optionsHi[key]=append(item.optionsHi[key],langs.hi);
      }
-    } else item.question=[item.question,text].filter(Boolean).join("\n");
+    } else {
+     const langs=splitLanguages(text);
+     if(langs.hi && !langs.en && item.question && !item.questionHi)item.questionHi=langs.hi;
+     else {if(langs.en)item.question=append(item.question,langs.en);if(langs.hi)item.questionHi=append(item.questionHi,langs.hi);}
+    }
    }
   }
-  const imgs=[...el.querySelectorAll("img")];
-  for(const img of imgs){const data=docxImageToData(img.getAttribute("src"));if(!data)continue;item.images.push(data);}
+  for(const img of [...el.querySelectorAll("img")]){const data=docxImageToData(img.getAttribute("src"));if(data)item.images.push(data);}
  }
- return out.filter(q=>q.question.trim()||Object.values(q.options).some(Boolean)||q.images.length||Object.values(q.optionImages).some(a=>a.length));
+ return out.filter(q=>q.question.trim()||q.questionHi.trim()||Object.values(q.options).some(Boolean)||q.images.length);
 }
 function renderDocxPreview(){
  const host=$("parsedQuestions");host.innerHTML="";
  parsedDocxQuestions.forEach((q,i)=>{
   const card=document.createElement("div");card.className="docx-question";card.dataset.index=i;
   const imageHtml=(arr,kind)=>arr.map((im,j)=>`<span><img class="docx-image" src="${im.preview}" alt="Extracted ${kind} ${j+1}"><button type="button" class="secondary" data-remove-image="${kind}:${j}">Remove image</button></span>`).join("");
-  const optionFields=["A","B","C","D"].map(k=>`<div><label>Option ${k}</label><textarea data-option="${k}">${esc(q.options[k])}</textarea>${imageHtml(q.optionImages[k],"option"+k)}</div>`).join("");
-  card.innerHTML=`<div class="row"><h4>Question ${i+1} (paper no. ${q.number})</h4><button type="button" class="danger remove-question">Delete question</button></div><label>Question text / table data</label><textarea data-question>${esc(q.question)}</textarea><div class="docx-image-row">${imageHtml(q.images,"question")}</div><div class="grid">${optionFields}</div><div class="grid"><div><label>Correct answer</label><select data-answer><option value="">Select answer</option>${["A","B","C","D"].map(k=>`<option value="${k}" ${q.answer===k?"selected":""}>${k}</option>`).join("")}</select></div><div><label>Explanation</label><textarea data-explanation>${esc(q.explanation)}</textarea></div></div><p class="muted">Images are shown here for review and will upload automatically when you import. This first version stores one question image and one image per option; remove any extra images you do not want to use.</p>`;
+  const optionFields=["A","B","C","D"].map(k=>`<div><label>Option ${k} (English)</label><textarea data-option="${k}">${esc(q.options[k])}</textarea><label>Option ${k} (Hindi)</label><textarea data-option-hi="${k}" placeholder="हिन्दी विकल्प ${k}">${esc(q.optionsHi?.[k]||"")}</textarea>${imageHtml(q.optionImages[k],"option"+k)}</div>`).join("");
+  card.innerHTML=`<div class="row"><h4>Question ${i+1} (paper no. ${q.number})</h4><button type="button" class="danger remove-question">Delete question</button></div><label>Question text (English)</label><textarea data-question>${esc(q.question)}</textarea><label>Question text (Hindi)</label><textarea data-question-hi placeholder="हिन्दी में प्रश्न">${esc(q.questionHi||"")}</textarea><div class="docx-image-row">${imageHtml(q.images,"question")}</div><div class="grid">${optionFields}</div><div class="grid"><div><label>Correct answer</label><select data-answer><option value="">Select answer</option>${["A","B","C","D"].map(k=>`<option value="${k}" ${q.answer===k?"selected":""}>${k}</option>`).join("")}</select></div><div><label>Explanation (English)</label><textarea data-explanation>${esc(q.explanation)}</textarea><label>Explanation (Hindi)</label><textarea data-explanation-hi placeholder="हिन्दी में व्याख्या">${esc(q.explanationHi||"")}</textarea></div></div><p class="muted">English and Hindi fields are saved separately. Check both languages before importing. Images upload automatically when you import.</p>`;
   card.querySelector("[data-question]").oninput=e=>q.question=e.target.value;
+  card.querySelector("[data-question-hi]").oninput=e=>q.questionHi=e.target.value;
   card.querySelectorAll("[data-option]").forEach(el=>el.oninput=()=>q.options[el.dataset.option]=el.value);
+  card.querySelectorAll("[data-option-hi]").forEach(el=>el.oninput=()=>q.optionsHi[el.dataset.optionHi]=el.value);
   card.querySelector("[data-answer]").onchange=e=>q.answer=e.target.value;
   card.querySelector("[data-explanation]").oninput=e=>q.explanation=e.target.value;
+  card.querySelector("[data-explanation-hi]").oninput=e=>q.explanationHi=e.target.value;
   card.querySelector(".remove-question").onclick=()=>{parsedDocxQuestions.splice(i,1);renderDocxPreview();};
   card.querySelectorAll("[data-remove-image]").forEach(b=>b.onclick=()=>{const [kind,n]=b.dataset.removeImage.split(":");if(kind==="question")q.images.splice(Number(n),1);else q.optionImages[kind.slice(-1)].splice(Number(n),1);renderDocxPreview();});
   host.appendChild(card);
@@ -244,7 +263,7 @@ $("parseDocx").onclick=async()=>{
  }catch(e){console.error("RankersBoard DOCX extraction error",e);$("docxMsg").textContent="Could not parse DOCX: "+(e.message||e)+". If it happens again, send the browser console error.";}
  finally{btn.disabled=false;}
 };
-$("addParsedQuestion").onclick=()=>{parsedDocxQuestions.push({number:parsedDocxQuestions.length+1,question:"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""});renderDocxPreview();};
+$("addParsedQuestion").onclick=()=>{parsedDocxQuestions.push({number:parsedDocxQuestions.length+1,question:"",options:{A:"",B:"",C:"",D:""},optionsHi:{A:"",B:"",C:"",D:""},questionHi:"",images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:"",explanationHi:""});renderDocxPreview();};
 $("importDocxQuestions").onclick=async()=>{
  const testId=$("testSelect").value,btn=$("importDocxQuestions"),msg=$("docxImportMsg");
  if(!testId){msg.textContent="Select the destination test in section 3 first.";return;}
@@ -259,7 +278,7 @@ $("importDocxQuestions").onclick=async()=>{
   for(let i=0;i<parsedDocxQuestions.length;i++){
    const q=parsedDocxQuestions[i];const questionImage=q.images[0]?await uploadOne(q.images[0],"question"):null;
    const optionUrls={};for(const k of ["A","B","C","D"])optionUrls[k]=q.optionImages[k][0]?await uploadOne(q.optionImages[k][0],"option"):null;
-   payload.push({test_id:testId,question_text:q.question.trim(),option_a:q.options.A.trim(),option_b:q.options.B.trim(),option_c:q.options.C.trim(),option_d:q.options.D.trim(),correct_option:q.answer,explanation:q.explanation.trim()||null,position:i+1,question_image_url:questionImage,option_a_image_url:optionUrls.A,option_b_image_url:optionUrls.B,option_c_image_url:optionUrls.C,option_d_image_url:optionUrls.D});
+   payload.push({test_id:testId,question_text:q.question.trim(),question_text_hi:(q.questionHi||"").trim()||null,option_a:q.options.A.trim(),option_b:q.options.B.trim(),option_c:q.options.C.trim(),option_d:q.options.D.trim(),option_a_hi:(q.optionsHi?.A||"").trim()||null,option_b_hi:(q.optionsHi?.B||"").trim()||null,option_c_hi:(q.optionsHi?.C||"").trim()||null,option_d_hi:(q.optionsHi?.D||"").trim()||null,correct_option:q.answer,explanation:q.explanation.trim()||null,explanation_hi:(q.explanationHi||"").trim()||null,position:i+1,question_image_url:questionImage,option_a_image_url:optionUrls.A,option_b_image_url:optionUrls.B,option_c_image_url:optionUrls.C,option_d_image_url:optionUrls.D});
   }
   const {error:dbError}=await supabase.from("rb_questions").insert(payload);
   if(dbError)throw new Error("Database import failed: "+dbError.message+". Uploaded images will be cleaned up; fix the reported issue before retrying.");
