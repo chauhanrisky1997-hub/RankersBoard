@@ -123,25 +123,41 @@ function parseDocxHtml(html){
  const doc=new DOMParser().parseFromString(html,"text/html"), blocks=[...doc.body.children];
  const out=[];let cur=null;
  const qStart=/^(?:Q(?:uestion)?\s*)?(\d{1,3})\s*[).:-]\s*(.*)$/i;
- const optStart=/^(?:\(?([A-D])\)?\s*[).:-]|Option\s+([A-D])\s*[:.-])\s*(.*)$/i;
  const ensure=()=>{if(!cur){cur={number:out.length+1,question:"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""};out.push(cur);}return cur;};
+ const append=(field,value)=>{if(value)field[field===undefined?"question":"question"]=value;};
  for(const el of blocks){
-  const text=cleanBlock(el);const qm=text.match(qStart);
-  if(qm){cur={number:Number(qm[1]),question:qm[2]||"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""};out.push(cur);}
-  else if(!cur){continue;}
+  let text=cleanBlock(el);
+  if(/^END OF (?:SAMPLE )?PAPER\b/i.test(text)) continue;
+  const qm=text.match(qStart);
+  if(qm){cur={number:Number(qm[1]),question:qm[2]||"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""};out.push(cur);text="";}
   const item=ensure();
-  if(qm){/* text already used as question prefix */}
-  else if(text){
-   const om=text.match(optStart);
-   if(om){const key=(om[1]||om[2]).toUpperCase();item.options[key]=[item.options[key],om[3]||""].filter(Boolean).join(" ");}
-   else if(/^\s*(?:answer|correct answer)\s*[:.-]/i.test(text)){const a=text.match(/\b([A-D])\b/i);if(a)item.answer=a[1].toUpperCase();}
-   else if(/^\s*(?:explanation|solution)\s*[:.-]/i.test(text)){item.explanation=text.replace(/^\s*(?:explanation|solution)\s*[:.-]\s*/i,"");}
-   else item.question=[item.question,text].filter(Boolean).join("\n");
+  // Keep tables readable as row/column text rather than flattening their cells together.
+  if(el.tagName==="TABLE") text=[...el.querySelectorAll("tr")].map(tr=>[...tr.children].map(td=>cleanBlock(td)).join(" | ")).join("\n");
+  if(text){
+   const ans=text.match(/^\s*(?:answer|correct answer)\s*[:.-]\s*([A-D])\b/i);
+   const exp=text.match(/^\s*(?:explanation|solution)\s*[:.-]\s*(.*)$/i);
+   if(ans)item.answer=ans[1].toUpperCase();
+   else if(exp)item.explanation=exp[1]||"";
+   else {
+    // A Word paragraph can contain all four options on one line. Split each marker
+    // instead of accidentally placing the entire option string in Option A.
+    const re=/(?:^|\s)(?:\(([A-D])\)|([A-D])[).])\s*/g;
+    const marks=[...text.matchAll(re)];
+    if(marks.length){
+     const prefix=text.slice(0,marks[0].index).trim();
+     if(prefix)item.question=[item.question,prefix].filter(Boolean).join("\n");
+     for(let n=0;n<marks.length;n++){
+      const key=(marks[n][1]||marks[n][2]).toUpperCase();
+      const begin=marks[n].index+marks[n][0].length;
+      const finish=n+1<marks.length?marks[n+1].index:text.length;
+      const value=text.slice(begin,finish).trim();
+      if(value)item.options[key]=[item.options[key],value].filter(Boolean).join(" ");
+     }
+    } else item.question=[item.question,text].filter(Boolean).join("\n");
+   }
   }
   const imgs=[...el.querySelectorAll("img")];
-  for(const img of imgs){const data=docxImageToData(img.getAttribute("src"));if(!data)continue;const prev=img.parentElement?.innerText||"";const om=prev.match(/\b(?:Option\s*)?([A-D])\s*[).:-]?/i);if(om)item.optionImages[om[1].toUpperCase()].push(data);else item.images.push(data);}
-  // Mammoth represents tables as table blocks; preserve their contents in the question text.
-  if(el.tagName==="TABLE"&&!text)item.question+="\n"+[...el.querySelectorAll("tr")].map(tr=>[...tr.children].map(td=>cleanBlock(td)).join(" | ")).join("\n");
+  for(const img of imgs){const data=docxImageToData(img.getAttribute("src"));if(!data)continue;item.images.push(data);}
  }
  return out.filter(q=>q.question.trim()||Object.values(q.options).some(Boolean)||q.images.length||Object.values(q.optionImages).some(a=>a.length));
 }
