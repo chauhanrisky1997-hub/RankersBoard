@@ -171,16 +171,16 @@ $("parseDocx").onclick=async()=>{
   const mammoth=mammothModule.default||mammothModule;
   if(!mammoth || typeof mammoth.convertToHtml!=="function") throw new Error("DOCX parser library did not load correctly. Refresh the page and try again.");
   const arrayBuffer=await file.arrayBuffer();
-  // Use a defensive image converter: some DOCX files have missing/odd image
-  // content-type metadata, while Mammoth's default converter assumes it exists.
-  const convertImage = mammoth.images && mammoth.images.imgElement
-    ? mammoth.images.imgElement(async image => {
-        const contentType = (image && image.contentType) || "image/png";
-        const base64 = await image.read("base64");
-        return { src: `data:${contentType};base64,${base64}` };
-      })
-    : undefined;
-  const result=await mammoth.convertToHtml({arrayBuffer}, convertImage ? {convertImage} : {});
+  // Bypass mammoth.images.imgElement: it assumes image.contentType exists
+  // and can throw when a DOCX image has missing content-type metadata.
+  // Read each image directly and provide a safe MIME fallback instead.
+  const convertImage = async image => {
+    const base64 = await image.read("base64");
+    const rawType = image && image.contentType ? String(image.contentType) : "image/png";
+    const contentType = /^image\/(png|jpeg|gif|bmp|webp|svg\+xml)$/i.test(rawType) ? rawType : "image/png";
+    return { src: `data:${contentType};base64,${base64}` };
+  };
+  const result=await mammoth.convertToHtml({arrayBuffer}, {convertImage});
   parsedDocxQuestions=parseDocxHtml(result.value).map(q=>({...q,images:q.images.map(x=>({...x,preview:URL.createObjectURL(x.blob)})),optionImages:Object.fromEntries(Object.entries(q.optionImages).map(([k,a])=>[k,a.map(x=>({...x,preview:URL.createObjectURL(x.blob)}))]))}));
   if(!parsedDocxQuestions.length)throw new Error("No questions could be detected. This DOCX may use an unusual layout; please check the file or use the manual CSV workflow for now.");
   renderDocxPreview();$("docxMsg").textContent=`Extracted ${parsedDocxQuestions.length} possible questions. ${result.messages?.length||0} document formatting notices. Review numbering, tables, options and answers before importing.`;
