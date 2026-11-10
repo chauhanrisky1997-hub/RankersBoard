@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Dashboard | RankersBoard</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fc;color:#17213a;font-family:Arial,sans-serif}header{background:#101b35;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}header a{color:white}main{max-width:1100px;margin:30px auto;padding:0 18px}.panel{background:white;border:1px solid #e1e7f2;border-radius:14px;padding:22px;margin-bottom:20px}h1{margin:0 0 6px}h2{margin:0 0 16px;font-size:20px}.muted{color:#657087;font-size:14px;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}input,select,textarea{width:100%;padding:11px;border:1px solid #cfd7e6;border-radius:8px;font:inherit}textarea{min-height:75px}button,.btn{border:0;border-radius:8px;padding:11px 15px;background:#315efb;color:white;font-weight:700;cursor:pointer;margin-top:12px}button.secondary{background:#e8edfa;color:#17213a}button.danger{background:#b42318}button:disabled{opacity:.6}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.test{border:1px solid #e1e7f2;border-radius:10px;padding:14px;margin-top:10px}.status{font-size:12px;font-weight:bold;color:#52617a}.msg{margin-top:10px;font-size:14px;color:#167647}.hidden{display:none}small{color:#657087}.credit{text-align:center;color:#9299a8;font-size:10px;padding:20px}
+
+.docx-question{border:1px solid #dedede;border-radius:12px;padding:16px;margin:14px 0;background:#fff}
+.docx-question h4{margin:0 0 8px}.docx-question .grid{margin-top:8px}.docx-image{max-width:220px;max-height:150px;object-fit:contain;border:1px solid #ddd;border-radius:8px;margin:6px}.docx-image-row{display:flex;gap:8px;flex-wrap:wrap}.docx-question textarea{min-height:62px}.docx-question .remove-question{background:#a32620}
+</style>
+<style id="rankersboard-monochrome-theme">
+:root{color-scheme:light;--rb-black:#111111;--rb-ink:#171717;--rb-muted:#6b6b6b;--rb-paper:#ffffff;--rb-soft:#f5f5f3;--rb-line:#e5e5e2;--rb-shadow:0 12px 32px rgba(0,0,0,.07)}
+html,body{background:var(--rb-paper)!important;color:var(--rb-ink)!important}
+body{font-family:Inter,Arial,Helvetica,sans-serif!important}
+a{color:var(--rb-ink)!important}
+header,nav,.navbar,.topbar,.sidebar,.site-header{background:#fff!important;color:#111!important;border-color:var(--rb-line)!important;box-shadow:0 4px 20px rgba(0,0,0,.035)}
+button,.btn,.button,input[type=submit],input[type=button],a.btn,a.button{background:#111!important;background-image:none!important;color:#fff!important;border:1px solid #111!important;border-radius:999px!important;box-shadow:none!important}
+button:hover,.btn:hover,.button:hover,input[type=submit]:hover,input[type=button]:hover,a.btn:hover,a.button:hover{background:#333!important;color:#fff!important}
+button.secondary,.btn-secondary,.secondary-button,a.secondary{background:#fff!important;color:#111!important;border:1px solid #cfcfcb!important}
+.card,.panel,.tile,.stat-card,.course-card,.test-card,.content-card,.modal-content{background:#fff!important;color:#171717!important;border:1px solid var(--rb-line)!important;border-radius:18px!important;box-shadow:var(--rb-shadow)!important}
+input,select,textarea{background:#fff!important;color:#171717!important;border:1px solid #d8d8d4!important;border-radius:10px!important}
+.badge,.tag,.pill{background:#f1f1ef!important;color:#222!important;border:1px solid #e1e1dd!important}
+footer{background:#111!important;color:#fff!important}
+[style*="#315efb"],[style*="#2563eb"],[style*="#3b82f6"],[style*="blue"],[style*="#1e40af"],[style*="#101b35"]{ }
+</style>
+
+</head><body><header><strong>RankersBoard · Admin</strong><div class="row" style="flex:0 1 auto"><a href="index.html">View site</a><button id="logout" class="secondary">Logout</button></div></header>
+<main><h1>Test management</h1><p class="muted">Create test categories, add questions and publish tests for your platform.</p>
+<section class="panel"><h2>1. Exam categories</h2><p class="muted">Site categories are added automatically: SSC Exams, SSC CGL 2025, Banking Exams and Railway Exams. Add another only if needed.</p><div class="row"><input id="categoryName" placeholder="e.g. SSC CGL, Banking, Railway"><button id="addCategory">Add category</button></div><div id="catMsg" class="msg"></div></section>
+<section class="panel"><h2>2. Create a test</h2><div class="grid">
+<div><label>Exam category</label><select id="category"></select></div><div><label>Test title</label><input id="title" placeholder="e.g. SSC CGL Quant Mock 01"></div><div><label>Subject</label><select id="subject"><option value="">Select subject</option><option>Maths</option><option>Reasoning</option><option>English</option><option>General Awareness</option><option>General Science</option><option>Computer Knowledge</option><option>Current Affairs</option><option value="__other__">Other / custom subject</option></select><input id="customSubject" class="hidden" placeholder="Enter subject name" style="margin-top:8px"></div><div><label>Section (optional)</label><input id="section" placeholder="e.g. Algebra"></div><div><label>Duration (minutes)</label><input id="duration" type="number" min="1" value="30"></div><div><label>Marks per correct answer</label><input id="positive" type="number" step="0.25" value="1"></div><div><label>Negative marks</label><input id="negative" type="number" step="0.25" value="0"></div></div><button id="createTest">Create draft test</button><div id="testMsg" class="msg"></div></section>
+<section class="panel"><h2>3. Add questions to a test</h2><label>Select test</label><select id="testSelect"></select><div class="grid"><div><label>Question</label><textarea id="qtext" placeholder="Enter question text"></textarea></div><div><label>Explanation (optional)</label><textarea id="explanation" placeholder="Explain the correct answer"></textarea></div></div><div class="grid">
+<div><label>Option A</label><input id="a"></div><div><label>Option B</label><input id="b"></div><div><label>Option C</label><input id="c"></div><div><label>Option D</label><input id="d"></div></div><div class="row"><div><label>Correct option</label><select id="correct"><option>A</option><option>B</option><option>C</option><option>D</option></select></div><div><label>Question number</label><input id="position" type="number" min="1" value="1"></div></div><button id="addQuestion">Save question</button><div id="questionMsg" class="msg"></div>
+<hr style="border:0;border-top:1px solid #e5eaf2;margin:22px 0"><h3>Bulk upload questions (CSV)</h3><p class="muted">CSV columns: question, option_a, option_b, option_c, option_d, correct_option, explanation. An extra index column is allowed. Use A/B/C/D for the correct option.</p><input type="file" id="csvFile" accept=".csv,text/csv"><button id="uploadCsv" class="secondary">Import CSV into selected test</button><div id="csvMsg" class="msg"></div><p><a href="rankersboard-question-template.csv" download>Download CSV template</a></p></section>
+<section class="panel" id="docxUploaderPanel">
+<h2>4. Direct question-paper upload (DOCX)</h2>
+<p class="muted">Upload an original Word paper. Embedded images are extracted and uploaded to RankersBoard storage automatically. Review and edit every question before importing. PDF support will be added separately.</p>
+<div class="grid"><div><label>Word question paper (.docx)</label><input id="docxFile" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></div><div><label>Destination test</label><p class="muted">Choose the destination test in section 3 before importing.</p></div></div>
+<button id="parseDocx" class="secondary">Extract questions and images</button><div id="docxMsg" class="msg" role="status"></div>
+<div id="docxPreview" class="hidden" style="margin-top:18px"><div class="row"><strong id="docxCount">0 questions extracted</strong><button id="addParsedQuestion" class="secondary">Add question</button></div><p class="muted">Check question numbering, options, images and correct answers. Any answer not found in the paper or answer key must be selected manually. Tables are retained as editable text.</p><div id="parsedQuestions"></div><button id="importDocxQuestions">Upload images &amp; import reviewed questions</button><div id="docxImportMsg" class="msg"></div></div>
+</section>
+
+<section class="panel"><h2>5. Existing tests</h2><div id="testsList" class="muted">Loading…</div></section>
+<div class="credit">Powered by Dark Vision by Sachit</div></main>
+<script type="module">
+import {supabase} from "./supabase-client.js";
+const $=id=>document.getElementById(id);let tests=[];
+async function ensureAdmin(){const {data,error}=await supabase.auth.getUser();if(error||!data.user){location.replace("admin.html");return false;}const {data:admin,error:e}=await supabase.from("rb_admin_users").select("user_id").eq("user_id",data.user.id).maybeSingle();if(e||!admin){await supabase.auth.signOut();location.replace("admin.html");return false;}return true;}
+async function load(){
+  const [cats,t]=await Promise.all([supabase.from("rb_exam_categories").select("*").order("name"),supabase.from("rb_tests").select("*,rb_exam_categories(name)").order("created_at",{ascending:false})]);
+  if(cats.error)throw cats.error;if(t.error)throw t.error;
+  const categoryNames=["SSC Exams","SSC CGL 2025","Banking Exams","Railway Exams"];
+  const existing=new Set(cats.data.map(x=>x.name.toLowerCase()));
+  const missing=categoryNames.filter(n=>!existing.has(n.toLowerCase()));
+  if(missing.length){const {error}=await supabase.from("rb_exam_categories").insert(missing.map(name=>({name})));if(!error){const refreshed=await supabase.from("rb_exam_categories").select("*").order("name");if(!refreshed.error)cats.data=refreshed.data;}}
+  $("category").innerHTML='<option value="">Select category</option>'+cats.data.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("");
+  tests=t.data;
+  $("testSelect").innerHTML=tests.map(x=>`<option value="${x.id}">${esc(x.title)} — ${esc(x.subject)}</option>`).join("")||'<option value="">Create a test first</option>';
+  $("testsList").innerHTML=tests.map(x=>`<div class="test"><strong>${esc(x.title)}</strong> <span class="status">${x.status.toUpperCase()}</span><p class="muted">${esc(x.rb_exam_categories?.name||"No category")} · ${esc(x.subject)} · ${x.duration_minutes} min · +${x.marks_per_correct} / −${x.negative_marks}</p><div class="row"><button class="secondary" data-publish="${x.id}">${x.status==="published"?"Unpublish":"Publish"}</button>${x.status!=="published"?`<button class="danger" data-delete="${x.id}">Delete draft</button>`:""}</div></div>`).join("")||"No tests created yet.";
+  $("testsList").querySelectorAll("[data-publish]").forEach(b=>b.onclick=()=>togglePublish(b.dataset.publish));
+  $("testsList").querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>deleteDraft(b.dataset.delete));
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+$("addCategory").onclick=async()=>{const name=$("categoryName").value.trim();if(!name)return;$("catMsg").textContent="Saving…";const {error}=await supabase.from("rb_exam_categories").insert({name});$("catMsg").textContent=error?error.message:"Category added.";if(!error){$("categoryName").value="";await load();}};
+$("subject").onchange=()=>{$("customSubject").classList.toggle("hidden",$("subject").value!=="__other__");};
+$("createTest").onclick=async()=>{const chosenSubject=$("subject").value;const payload={category_id:$("category").value||null,title:$("title").value.trim(),subject:chosenSubject==="__other__"?$("customSubject").value.trim():chosenSubject,section:$("section").value.trim()||null,duration_minutes:Number($("duration").value),marks_per_correct:Number($("positive").value),negative_marks:Number($("negative").value)};if(!payload.title||!payload.subject||!payload.category_id){$("testMsg").textContent="Select an exam category and subject, and enter the test title.";return;}const {data,error}=await supabase.from("rb_tests").insert(payload).select().single();$("testMsg").textContent=error?error.message:"Draft test created.";if(!error){$("title").value="";$("subject").value="";$("customSubject").value="";$("customSubject").classList.add("hidden");await load();$("testSelect").value=data.id;}};
+$("addQuestion").onclick=async()=>{const test_id=$("testSelect").value;const p={test_id,question_text:$("qtext").value.trim(),option_a:$("a").value.trim(),option_b:$("b").value.trim(),option_c:$("c").value.trim(),option_d:$("d").value.trim(),correct_option:$("correct").value,explanation:$("explanation").value.trim()||null,position:Number($("position").value)||1};if(!test_id||!p.question_text||!p.option_a||!p.option_b||!p.option_c||!p.option_d){$("questionMsg").textContent="Select a test and fill the question and all four options.";return;}const {error}=await supabase.from("rb_questions").insert(p);$("questionMsg").textContent=error?error.message:"Question saved.";if(!error){["qtext","a","b","c","d","explanation"].forEach(id=>$(id).value="");$("position").value=Number($("position").value)+1;}};
+async function togglePublish(id){const t=tests.find(x=>String(x.id)===String(id));const {error}=await supabase.from("rb_tests").update({status:t.status==="published"?"draft":"published",updated_at:new Date().toISOString()}).eq("id",id);if(error)alert(error.message);else await load();}
+async function deleteDraft(id){const t=tests.find(x=>String(x.id)===String(id));if(!t||t.status==="published"){alert("Only unpublished draft tests can be deleted here.");return;}if(!confirm(`Delete draft test "${t.title}" and all its questions? This cannot be undone.`))return;const {error:qError}=await supabase.from("rb_questions").delete().eq("test_id",id);if(qError){alert("Could not delete its questions: "+qError.message);return;}const {error}=await supabase.from("rb_tests").delete().eq("id",id).eq("status","draft");if(error){alert(error.message);return;}$("testMsg").textContent="Draft test and its questions deleted.";await load();}
+function parseCSV(text){
+  text=text.replace(/^\uFEFF/,"");
+  const rows=[];let row=[],v="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(c==='"'&&q&&text[i+1]==='"'){v+='"';i++;}
+    else if(c==='"'){q=!q;}
+    else if(c===','&&!q){row.push(v);v="";}
+    else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&text[i+1]==='\n')i++;row.push(v);if(row.some(x=>x.trim()))rows.push(row);row=[];v="";}
+    else v+=c;
+  }
+  row.push(v);if(row.some(x=>x.trim()))rows.push(row);return rows;
+}
+$("uploadCsv").onclick=async()=>{
+  const button=$("uploadCsv"),msg=$("csvMsg"),f=$("csvFile").files[0],test_id=$("testSelect").value;
+  if(!f||!test_id){msg.textContent="Choose a CSV file and a test.";return;}
+  button.disabled=true;msg.textContent="Reading and validating CSV…";
+  try{
+    const rows=parseCSV(await f.text());
+    if(rows.length<2)throw new Error("CSV has a header row but no question rows.");
+    const headers=rows.shift().map(x=>x.trim().toLowerCase().replace(/^\uFEFF/,""));
+    const aliases={question:["question","question_text","questiontext"],option_a:["option_a","option a","a"],option_b:["option_b","option b","b"],option_c:["option_c","option c","c"],option_d:["option_d","option d","d"],correct_option:["correct_option","correct option","answer","correct_answer","correct answer"],explanation:["explanation","solution"]};
+    const col={};for(const [key,names] of Object.entries(aliases))col[key]=headers.findIndex(h=>names.includes(h));
+    const required=["question","option_a","option_b","option_c","option_d","correct_option"];
+    const missing=required.filter(k=>col[k]<0);
+    if(missing.length)throw new Error("Missing CSV columns: "+missing.join(", ")+". Found: "+headers.join(", "));
+    const payload=[];const errors=[];
+    rows.forEach((r,i)=>{
+      const get=k=>col[k]>=0?String(r[col[k]]??"").trim():"";
+      const answer=get("correct_option").toUpperCase().replace(/^OPTION\s*/,"");
+      const item={test_id,question_text:get("question"),option_a:get("option_a"),option_b:get("option_b"),option_c:get("option_c"),option_d:get("option_d"),correct_option:answer,explanation:get("explanation")||null,position:payload.length+1};
+      const missingFields=["question_text","option_a","option_b","option_c","option_d"].filter(k=>!item[k]);
+      if(missingFields.length||!['A','B','C','D'].includes(answer)){if(errors.length<8)errors.push("Row "+(i+2)+": "+(missingFields.length?"empty "+missingFields.join("/"):"correct_option must be A, B, C or D"));}
+      else payload.push(item);
+    });
+    if(errors.length)throw new Error("CSV validation failed. "+errors.join("; "));
+    if(!payload.length)throw new Error("No valid question rows found.");
+    msg.textContent="Importing "+payload.length+" questions…";
+    let imported=0;
+    for(let i=0;i<payload.length;i+=100){
+      const batch=payload.slice(i,i+100);
+      const {error}=await supabase.from("rb_questions").insert(batch);
+      if(error)throw new Error("Imported "+imported+" of "+payload.length+" questions. Supabase error: "+error.message+". Fix the issue before retrying to avoid duplicate rows.");
+      imported+=batch.length;msg.textContent="Imported "+imported+" / "+payload.length+" questions…";
+    }
+    msg.textContent="Success! Imported "+imported+" questions into the selected test. The 'index' column, if present, was ignored.";
+    $("csvFile").value="";
+  }catch(e){msg.textContent=e.message||String(e);}
+  finally{button.disabled=false;}
+};
+
+// DOCX importer: extract text and embedded images, then let the admin review/edit before import.
+let parsedDocxQuestions=[];
+const docxImageToData=src=>{const m=String(src||"").match(/^data:([^;]+);base64,(.+)$/);if(!m)return null;const raw=atob(m[2]),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return {blob:new Blob([bytes],{type:m[1]}),type:m[1]};};
+function cleanBlock(el){return (el.innerText||el.textContent||"").replace(/\u00a0/g," ").replace(/[\t ]+/g," ").trim();}
+function parseDocxHtml(html){
+ const doc=new DOMParser().parseFromString(html,"text/html"), blocks=[...doc.body.children];
+ const out=[];let cur=null;
+ const qStart=/^(?:Q(?:uestion)?\s*)?(\d{1,3})\s*[).:-]\s*(.*)$/i;
+ const optStart=/^(?:\(?([A-D])\)?\s*[).:-]|Option\s+([A-D])\s*[:.-])\s*(.*)$/i;
+ const ensure=()=>{if(!cur){cur={number:out.length+1,question:"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""};out.push(cur);}return cur;};
+ for(const el of blocks){
+  const text=cleanBlock(el);const qm=text.match(qStart);
+  if(qm){cur={number:Number(qm[1]),question:qm[2]||"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""};out.push(cur);}
+  else if(!cur){continue;}
+  const item=ensure();
+  if(qm){/* text already used as question prefix */}
+  else if(text){
+   const om=text.match(optStart);
+   if(om){const key=(om[1]||om[2]).toUpperCase();item.options[key]=[item.options[key],om[3]||""].filter(Boolean).join(" ");}
+   else if(/^\s*(?:answer|correct answer)\s*[:.-]/i.test(text)){const a=text.match(/\b([A-D])\b/i);if(a)item.answer=a[1].toUpperCase();}
+   else if(/^\s*(?:explanation|solution)\s*[:.-]/i.test(text)){item.explanation=text.replace(/^\s*(?:explanation|solution)\s*[:.-]\s*/i,"");}
+   else item.question=[item.question,text].filter(Boolean).join("\n");
+  }
+  const imgs=[...el.querySelectorAll("img")];
+  for(const img of imgs){const data=docxImageToData(img.getAttribute("src"));if(!data)continue;const prev=img.parentElement?.innerText||"";const om=prev.match(/\b(?:Option\s*)?([A-D])\s*[).:-]?/i);if(om)item.optionImages[om[1].toUpperCase()].push(data);else item.images.push(data);}
+  // Mammoth represents tables as table blocks; preserve their contents in the question text.
+  if(el.tagName==="TABLE"&&!text)item.question+="\n"+[...el.querySelectorAll("tr")].map(tr=>[...tr.children].map(td=>cleanBlock(td)).join(" | ")).join("\n");
+ }
+ return out.filter(q=>q.question.trim()||Object.values(q.options).some(Boolean)||q.images.length||Object.values(q.optionImages).some(a=>a.length));
+}
+function renderDocxPreview(){
+ const host=$("parsedQuestions");host.innerHTML="";
+ parsedDocxQuestions.forEach((q,i)=>{
+  const card=document.createElement("div");card.className="docx-question";card.dataset.index=i;
+  const imageHtml=(arr,kind)=>arr.map((im,j)=>`<span><img class="docx-image" src="${im.preview}" alt="Extracted ${kind} ${j+1}"><button type="button" class="secondary" data-remove-image="${kind}:${j}">Remove image</button></span>`).join("");
+  const optionFields=["A","B","C","D"].map(k=>`<div><label>Option ${k}</label><textarea data-option="${k}">${esc(q.options[k])}</textarea>${imageHtml(q.optionImages[k],"option"+k)}</div>`).join("");
+  card.innerHTML=`<div class="row"><h4>Question ${i+1} (paper no. ${q.number})</h4><button type="button" class="danger remove-question">Delete question</button></div><label>Question text / table data</label><textarea data-question>${esc(q.question)}</textarea><div class="docx-image-row">${imageHtml(q.images,"question")}</div><div class="grid">${optionFields}</div><div class="grid"><div><label>Correct answer</label><select data-answer><option value="">Select answer</option>${["A","B","C","D"].map(k=>`<option value="${k}" ${q.answer===k?"selected":""}>${k}</option>`).join("")}</select></div><div><label>Explanation</label><textarea data-explanation>${esc(q.explanation)}</textarea></div></div><p class="muted">Images are shown here for review and will upload automatically when you import. This first version stores one question image and one image per option; remove any extra images you do not want to use.</p>`;
+  card.querySelector("[data-question]").oninput=e=>q.question=e.target.value;
+  card.querySelectorAll("[data-option]").forEach(el=>el.oninput=()=>q.options[el.dataset.option]=el.value);
+  card.querySelector("[data-answer]").onchange=e=>q.answer=e.target.value;
+  card.querySelector("[data-explanation]").oninput=e=>q.explanation=e.target.value;
+  card.querySelector(".remove-question").onclick=()=>{parsedDocxQuestions.splice(i,1);renderDocxPreview();};
+  card.querySelectorAll("[data-remove-image]").forEach(b=>b.onclick=()=>{const [kind,n]=b.dataset.removeImage.split(":");if(kind==="question")q.images.splice(Number(n),1);else q.optionImages[kind.slice(-1)].splice(Number(n),1);renderDocxPreview();});
+  host.appendChild(card);
+ });
+ $("docxCount").textContent=parsedDocxQuestions.length+" questions extracted";
+ $("docxPreview").classList.toggle("hidden",!parsedDocxQuestions.length);
+}
+$("parseDocx").onclick=async()=>{
+ const file=$("docxFile").files[0];if(!file){$("docxMsg").textContent="Choose a DOCX file first.";return;}
+ const btn=$("parseDocx");btn.disabled=true;$("docxMsg").textContent="Reading Word document and extracting embedded images…";
+ try{
+  const {default:mammoth}=await import("https://cdn.jsdelivr.net/npm/mammoth@1.9.0/+esm");
+  const arrayBuffer=await file.arrayBuffer();
+  const result=await mammoth.convertToHtml({arrayBuffer},{convertImage:mammoth.images.imgElement(async image=>({src:`data:${image.contentType};base64,${await image.read("base64")}`}))});
+  parsedDocxQuestions=parseDocxHtml(result.value).map(q=>({...q,images:q.images.map(x=>({...x,preview:URL.createObjectURL(x.blob)})),optionImages:Object.fromEntries(Object.entries(q.optionImages).map(([k,a])=>[k,a.map(x=>({...x,preview:URL.createObjectURL(x.blob)}))]))}));
+  if(!parsedDocxQuestions.length)throw new Error("No questions could be detected. This DOCX may use an unusual layout; please check the file or use the manual CSV workflow for now.");
+  renderDocxPreview();$("docxMsg").textContent=`Extracted ${parsedDocxQuestions.length} possible questions. ${result.messages?.length||0} document formatting notices. Review numbering, tables, options and answers before importing.`;
+ }catch(e){$("docxMsg").textContent="Could not parse DOCX: "+(e.message||e);}
+ finally{btn.disabled=false;}
+};
+$("addParsedQuestion").onclick=()=>{parsedDocxQuestions.push({number:parsedDocxQuestions.length+1,question:"",options:{A:"",B:"",C:"",D:""},images:[],optionImages:{A:[],B:[],C:[],D:[]},answer:"",explanation:""});renderDocxPreview();};
+$("importDocxQuestions").onclick=async()=>{
+ const testId=$("testSelect").value,btn=$("importDocxQuestions"),msg=$("docxImportMsg");
+ if(!testId){msg.textContent="Select the destination test in section 3 first.";return;}
+ if(!parsedDocxQuestions.length){msg.textContent="No reviewed questions to import.";return;}
+ const invalid=parsedDocxQuestions.findIndex(q=>!q.question.trim()||["A","B","C","D"].some(k=>!q.options[k].trim())||!q.answer);
+ if(invalid>=0){msg.textContent=`Question ${invalid+1} needs question text, all four options and a correct answer.`;return;}
+ if(!confirm(`Import ${parsedDocxQuestions.length} reviewed questions into the selected test?`))return;
+ btn.disabled=true;let imported=0,uploaded=0;const uploadedPaths=[];
+ try{
+  const uploadOne=async(img,label)=>{const ext=img.type.split("/")[1]?.replace("jpeg","jpg")||"png";const path=`docx-import/${Date.now()}-${crypto.randomUUID()}.${ext}`;const {error}=await supabase.storage.from("question-images").upload(path,img.blob,{contentType:img.type,upsert:false});if(error)throw new Error("Image upload failed: "+error.message+". Check the question-images bucket upload policy.");uploadedPaths.push(path);const {data}=supabase.storage.from("question-images").getPublicUrl(path);uploaded++;return data.publicUrl;};
+  const payload=[];
+  for(let i=0;i<parsedDocxQuestions.length;i++){
+   const q=parsedDocxQuestions[i];const questionImage=q.images[0]?await uploadOne(q.images[0],"question"):null;
+   const optionUrls={};for(const k of ["A","B","C","D"])optionUrls[k]=q.optionImages[k][0]?await uploadOne(q.optionImages[k][0],"option"):null;
+   payload.push({test_id:testId,question_text:q.question.trim(),option_a:q.options.A.trim(),option_b:q.options.B.trim(),option_c:q.options.C.trim(),option_d:q.options.D.trim(),correct_option:q.answer,explanation:q.explanation.trim()||null,position:i+1,question_image_url:questionImage,option_a_image_url:optionUrls.A,option_b_image_url:optionUrls.B,option_c_image_url:optionUrls.C,option_d_image_url:optionUrls.D});
+  }
+  const {error:dbError}=await supabase.from("rb_questions").insert(payload);
+  if(dbError)throw new Error("Database import failed: "+dbError.message+". Uploaded images will be cleaned up; fix the reported issue before retrying.");
+  imported=payload.length;
+  msg.textContent=`Success: ${imported} questions imported and ${uploaded} images uploaded. Review the test before publishing.`;$("docxMsg").textContent="Import completed.";parsedDocxQuestions=[];renderDocxPreview();$("docxFile").value="";
+ }catch(e){if(uploadedPaths.length){const {error:cleanupError}=await supabase.storage.from("question-images").remove(uploadedPaths);if(cleanupError)msg.textContent=(e.message||String(e))+" (Some unused uploaded images may need cleanup.)";else msg.textContent=e.message||String(e);}else msg.textContent=e.message||String(e);}
+ finally{btn.disabled=false;}
+};
+
+$("logout").onclick=async()=>{await supabase.auth.signOut();location.href="admin.html";};
+if(await ensureAdmin()){try{await load();}catch(e){$("testsList").textContent=e.message;}}
+</script></body></html>
