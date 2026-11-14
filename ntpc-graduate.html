@@ -12,7 +12,7 @@ async function load(){
  try{
   const {data:auth,error:authError}=await supabase.auth.getUser();
   if(authError||!auth.user){location.replace("candidate-login.html?next="+encodeURIComponent(location.pathname));return;}
-  const {data:tests,error}=await supabase.from("rb_tests").select("id,title,subject,section,duration_minutes,marks_per_correct,negative_marks,created_at,rb_exam_categories(name)").eq("status","published").ilike("rb_exam_categories.name","%"+target+"%").order("created_at",{ascending:false});
+  const {data:tests,error}=await supabase.from("rb_tests").select("id,title,subject,section,duration_minutes,marks_per_correct,negative_marks,created_at,rb_exam_categories!inner(name)").eq("status","published").ilike("rb_exam_categories.name","%"+target+"%").order("created_at",{ascending:false});
   if(error)throw error;
   if(!tests?.length){message("No published "+target+" tests are available yet. Please check back soon.");return;}
   host.replaceChildren();
