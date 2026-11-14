@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#b5122b"><title>NTPC Graduate | RankersBoard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Slab:wght@600;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="rankersboard-theme.css"></head><body>
+<header class="rb-header"><div class="rb-nav"><a class="rb-brand" href="index.html"><span class="rb-brand-mark"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 29.5 25.8 8.2a3.4 3.4 0 0 1 4.8-.4l2.1 1.8a3.4 3.4 0 0 1 .4 4.8L15.3 35.7 7 37z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="m23.1 11.4 7.3 6.1M8 29.5l7.3 6.2M7 37l1-7.5M7 5h10M7 10h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg></span><span>RankersBoard</span></a><a class="rb-back" href="railway-exams.html">← Back to pathways</a></div></header>
+<main class="rb-main"><section class="rb-hero"><div class="rb-kicker">NTPC PRACTICE</div><h1 class="rb-title">NTPC Graduate</h1><p class="rb-lead">Published tests for this pathway will appear below. Sign in to attempt a test.</p></section>
+<section style="margin-top:22px"><div id="testList" class="rb-grid"><p class="rb-message">Loading published tests…</p></div></section></main><footer class="rb-footer">© 2026 RankersBoard. Practice. Improve. Succeed.</footer>
+<script type="module">
+import { supabase } from "./supabase-client.js";
+const target = "NTPC Graduate";
+const host = document.getElementById("testList");
+function message(t){host.replaceChildren(Object.assign(document.createElement("p"),{className:"rb-message",textContent:t}));}
+async function load(){
+ try{
+  const {data:auth,error:authError}=await supabase.auth.getUser();
+  if(authError||!auth.user){location.replace("candidate-login.html?next="+encodeURIComponent(location.pathname));return;}
+  const {data:tests,error}=await supabase.from("rb_tests").select("id,title,subject,section,duration_minutes,marks_per_correct,negative_marks,created_at,rb_exam_categories(name)").eq("status","published").ilike("rb_exam_categories.name","%"+target+"%").order("created_at",{ascending:false});
+  if(error)throw error;
+  if(!tests?.length){message("No published "+target+" tests are available yet. Please check back soon.");return;}
+  host.replaceChildren();
+  for(const test of tests){
+   const card=document.createElement("article");card.className="rb-card";
+   const title=document.createElement("h2");title.textContent=test.title;
+   const cat=document.createElement("p");cat.textContent=test.rb_exam_categories?.name||target;
+   const meta=document.createElement("p");meta.textContent=(test.section?test.subject+" · "+test.section:test.subject)+" · "+test.duration_minutes+" min · +"+test.marks_per_correct+" / −"+test.negative_marks;
+   const link=document.createElement("a");link.className="rb-btn";link.textContent="START TEST →";link.href="mock-test.html?test_id="+encodeURIComponent(test.id);
+   card.append(title,cat,meta,link);host.append(card);
+  }
+ }catch(e){console.error(e);message("Tests could not be loaded. Refresh and try again.");}
+}
+load();
+</script></body></html>
