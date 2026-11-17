@@ -398,7 +398,7 @@ function updateTimer(){
  $("timer").classList.toggle("warning",state.seconds<=60);
  $("lastTime").textContent=`Last ${Math.ceil(state.seconds/60)} Minutes`;
 }
-function finishTest(auto=false){
+async function finishTest(auto=false){
  if(state.finished)return;
  const answered=state.answers.filter(v=>v!==null).length;
  if(!auto&&!confirm(`Submit your test?\nAnswered: ${answered}/${questions.length}\nUnanswered: ${questions.length-answered}`))return;
@@ -406,17 +406,24 @@ function finishTest(auto=false){
  let correct=0,wrong=0,unanswered=0;
  state.answers.forEach((a,i)=>{if(a===null)unanswered++;else if(a===questions[i].answer)correct++;else wrong++;});
  const score=correct*Number(testConfig.marks_per_correct)-wrong*Number(testConfig.negative_marks);
+ const accuracy=answered?correct/answered*100:0;
+ const durationSeconds=Math.max(0,Number(testConfig.duration_minutes)*60-state.seconds);
  testArea.classList.add("hidden");$("sectionBar").classList.add("hidden");
  document.querySelector(".controlbar").classList.add("hidden");
  document.querySelector(".marking").classList.add("hidden");document.querySelector(".answered-line").classList.add("hidden");
  resultArea.classList.remove("hidden");resultArea.replaceChildren();
  const h=document.createElement("h2");h.textContent=auto?"Time Over — Test Submitted":"Test Submitted Successfully";
+ const saveNote=document.createElement("p");saveNote.textContent="Saving your result securely…";
  const sc=document.createElement("div");sc.className="score";sc.textContent=`${score.toFixed(2)} marks`;
  const summary=document.createElement("div");summary.className="result-grid";
- [["Correct",correct],["Incorrect",wrong],["Unanswered",unanswered]].forEach(([name,value])=>{const d=document.createElement("div"),b=document.createElement("b");b.textContent=value;d.append(b,document.createTextNode(name));summary.appendChild(d);});
+ [["Correct",correct],["Incorrect",wrong],["Unanswered",unanswered],["Accuracy",accuracy.toFixed(1)+"%"],["Time taken",`${Math.floor(durationSeconds/60)}m ${durationSeconds%60}s`],["Questions",questions.length]].forEach(([name,value])=>{const d=document.createElement("div"),b=document.createElement("b");b.textContent=value;d.append(b,document.createTextNode(name));summary.appendChild(d);});
  const details=document.createElement("p");details.textContent=`${testConfig.title} · ${questions.length} questions · +${testConfig.marks_per_correct} / −${testConfig.negative_marks}`;
- resultArea.append(h,sc,summary,details);
+ resultArea.append(h,sc,summary,details,saveNote);
  const reviewTitle=document.createElement("h2");reviewTitle.textContent="Answer Analysis";resultArea.appendChild(reviewTitle);
+ const analysis=document.createElement("div");analysis.className="result-grid";
+ const attempted=correct+wrong;
+ [["Attempt rate",(attempted/questions.length*100).toFixed(1)+"%"],["Correct rate",(correct/questions.length*100).toFixed(1)+"%"],["Wrong rate",(wrong/questions.length*100).toFixed(1)+"%"]].forEach(([name,value])=>{const d=document.createElement("div"),b=document.createElement("b");b.textContent=value;d.append(b,document.createTextNode(name));analysis.appendChild(d);});
+ resultArea.appendChild(analysis);
  questions.forEach((q,i)=>{
   const d=document.createElement("div");d.className="review-item";
   const p=document.createElement("p");p.textContent=`Q${i+1}. ${activeLanguage==="hi"&&q.textHi?q.textHi:q.textEn}`;
@@ -426,7 +433,20 @@ function finishTest(auto=false){
   const explanation=document.createElement("p");const exp=activeLanguage==="hi"&&q.explanationHi?q.explanationHi:q.explanationEn;explanation.textContent=exp?(activeLanguage==="hi"?"व्याख्या: ":"Explanation: ")+exp:"";
   d.append(p,yours,right,explanation);resultArea.appendChild(d);
  });
- const back=document.createElement("button");back.className="exam-btn";back.textContent="Back to Candidate Dashboard";back.addEventListener("click",()=>location.href="candidate-dashboard.html");resultArea.appendChild(back);
+ const actions=document.createElement("div");actions.style.cssText="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px";
+ const board=document.createElement("a");board.className="exam-btn";board.textContent="View this test’s Top 20 leaderboard";board.href=`leaderboard.html?test_id=${encodeURIComponent(testConfig.id)}`;board.style.cssText="display:inline-flex;align-items:center;text-decoration:none";
+ const back=document.createElement("button");back.className="exam-btn";back.textContent="Back to Candidate Dashboard";back.addEventListener("click",()=>location.href="candidate-dashboard.html");
+ actions.append(board,back);resultArea.appendChild(actions);
+ try{
+  const payload={};questions.forEach((q,i)=>{payload[String(q.id)]=state.answers[i]===null?null:state.answers[i];});
+  const {data:saveData,error:saveError}=await supabase.rpc("rb_submit_mock_attempt",{p_test_id:Number(testConfig.id),p_answers:payload,p_duration_seconds:durationSeconds});
+  if(saveError)throw saveError;
+  saveNote.textContent="Your result has been saved. Your leaderboard position is being updated.";
+  if(saveData?.score!==undefined)sc.textContent=`${Number(saveData.score).toFixed(2)} marks`;
+ }catch(err){
+  saveNote.textContent="Your on-screen analysis is ready, but this result could not be saved to the leaderboard. Please contact support and share this message: "+(err.message||"Save failed");
+  saveNote.style.color="#b42318";
+ }
  window.scrollTo({top:0,behavior:"smooth"});
 }
 $("prevBtn").addEventListener("click",()=>{if(state.current>0){state.current--;renderQuestion();}});
@@ -533,7 +553,7 @@ async function initialise(){
   if(questionError)throw questionError;
   if(!rows?.length)throw new Error("No questions have been added to this test.");
   testConfig=test;
-  questions=rows.map(r=>({textEn:r.question_text||"",textHi:r.question_text_hi||"",optionsEn:[r.option_a,r.option_b,r.option_c,r.option_d],optionsHi:[r.option_a_hi||"",r.option_b_hi||"",r.option_c_hi||"",r.option_d_hi||""],imageUrl:r.question_image_url||"",optionImageUrls:[r.option_a_image_url||"",r.option_b_image_url||"",r.option_c_image_url||"",r.option_d_image_url||""],answer:["A","B","C","D"].indexOf(String(r.correct_option).toUpperCase()),explanationEn:r.explanation||"",explanationHi:r.explanation_hi||""}));
+  questions=rows.map(r=>({id:r.id,textEn:r.question_text||"",textHi:r.question_text_hi||"",optionsEn:[r.option_a,r.option_b,r.option_c,r.option_d],optionsHi:[r.option_a_hi||"",r.option_b_hi||"",r.option_c_hi||"",r.option_d_hi||""],imageUrl:r.question_image_url||"",optionImageUrls:[r.option_a_image_url||"",r.option_b_image_url||"",r.option_c_image_url||"",r.option_d_image_url||""],answer:["A","B","C","D"].indexOf(String(r.correct_option).toUpperCase()),explanationEn:r.explanation||"",explanationHi:r.explanation_hi||""}));
   hasHindi=questions.some(q=>q.textHi||q.optionsHi.some(Boolean));
   $("introLanguage").querySelector('option[value="Hindi"]')?.toggleAttribute("disabled",!hasHindi);
   $("languageSelect").innerHTML=hasHindi?'<option value="en">English</option><option value="hi">हिन्दी</option>':'<option value="en">English</option>';

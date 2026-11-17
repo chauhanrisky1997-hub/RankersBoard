@@ -156,9 +156,13 @@
         const category = document.createElement("p"); category.textContent = test.rb_exam_categories?.name || "Competitive Exam";
         const subject = document.createElement("p"); subject.textContent = `${test.subject}${test.section ? " · " + test.section : ""}`;
         const details = document.createElement("p"); details.textContent = `${test.duration_minutes} minutes · +${test.marks_per_correct} / −${test.negative_marks}`;
+        const actions = document.createElement("div"); actions.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;align-items:center";
         const start = document.createElement("a"); start.className = "btn"; start.textContent = "Start Test →";
         start.href = `mock-test.html?test_id=${encodeURIComponent(test.id)}`;
-        card.append(heading, category, subject, details, start);
+        const leaderboard = document.createElement("a"); leaderboard.className = "btn logout-btn"; leaderboard.textContent = "Top 20 →";
+        leaderboard.href = `leaderboard.html?test_id=${encodeURIComponent(test.id)}`;
+        actions.append(start, leaderboard);
+        card.append(heading, category, subject, details, actions);
         availableTests.appendChild(card);
       });
     }
